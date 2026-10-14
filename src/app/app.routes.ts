@@ -4,7 +4,7 @@ import { OwnerGui } from './frontend/owner-gui/owner-gui';
 import { DriverGui } from './frontend/driver-gui/driver-gui';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/work-num-form', pathMatch: 'full' },
+  { path: '', component: WorkNumForm },
   { path: 'work-num-form', component: WorkNumForm },
   { path: 'owner-gui', component: OwnerGui },
   { path: 'driver-gui', component: DriverGui }
