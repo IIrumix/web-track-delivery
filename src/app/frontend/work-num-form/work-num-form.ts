@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  imports: [],
+  imports: [RouterModule],
   selector: 'app-work-num-form',
   styleUrl: './work-num-form.css',
   templateUrl: './work-num-form.html',
