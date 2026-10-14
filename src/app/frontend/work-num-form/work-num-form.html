@@ -16,10 +16,10 @@
     </div>
     <div class="flex mb-12.5 flex-col gap-3.5">
         <span class="font-light text-[#0F172A] text-sm">เลขใบงาน</span>
-        <input type="text" placeholder="กรอกเลขใบงาน" class="w-80 h-12 border-b border-[#D1D5DB]  text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-b-2 focus:border-[#98FF98] transition delay-75 duration-200 ease" />
+        <input #workNumInput type="text" placeholder="กรอกเลขใบงาน" class="w-80 h-12 border-b border-[#D1D5DB]  text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-b-2 focus:border-[#98FF98] transition delay-75 duration-200 ease" />
     </div>
     <div class="mb-12.5">
-      <button class="w-80 h-12 bg-[#FF7A1A] text-[#0F172A] text-sm font-medium hover:bg-[#E06000] transition duration-200 ease">ยืนยัน</button>
+      <button class="w-80 h-12 bg-[#FF7A1A] text-[#0F172A] text-sm font-medium hover:bg-[#E06000] transition duration-200 ease" (click)="secretOwnerPage(workNumInput)">ยืนยัน</button>
     </div>
     <div class="flex mb-11 opacity-72 flex-col">
         <span class="font-normal text-[#0F172A] text-sm"> ระบบจะตรวจสอบเลขใบงานและแสดงรายละเอียดที่เกี่ยวข้องให้ทันที</span>
