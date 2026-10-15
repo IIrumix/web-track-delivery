@@ -8,7 +8,8 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
-import { CustomerRecord, CustomerStore } from '../customer-store';
+import { CustomerRecord } from '../../../../model/customer-response';
+import { CustomerService } from '../../../../service/customer.service';
 
 @Component({
   selector: 'app-customer-detail-panel',
@@ -30,7 +31,7 @@ export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
   });
 
   constructor(
-    public store: CustomerStore,
+    public store: CustomerService,
     private changeDetector: ChangeDetectorRef,
   ) {
     this.dataSubscription = this.store.changes.subscribe((action) => {

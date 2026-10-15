@@ -1,28 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
+import { CustomerRecord, CustomerResponse } from '../model/customer-response';
 
 export const CUSTOMERS_API_URL = '/api/customers';
 
-interface ApiCustomer {
-  customer_id: number | string;
-  name: string;
-  phone: string | null;
-  address: string | null;
-  latitude: number | string | null;
-  longitude: number | string | null;
-}
-
-export interface CustomerRecord {
-  id: number | string;
-  name: string;
-  phone: string;
-  address: string;
-  coordinates: [number, number] | null;
-}
-
 @Injectable()
-export class CustomerStore implements OnDestroy {
+export class CustomerService implements OnDestroy {
   customers: CustomerRecord[] = [];
   locatedCustomers: CustomerRecord[] = [];
   filteredCustomers: CustomerRecord[] = [];
@@ -46,46 +30,50 @@ export class CustomerStore implements OnDestroy {
     this.selectedCustomer = null;
     this.changes.next('updated');
 
-    this.request = this.http.get<ApiCustomer[]>(CUSTOMERS_API_URL, { timeout: 60000 }).subscribe({
-      next: (data) => {
-        if (!Array.isArray(data)) {
-          this.showLoadError();
-          return;
-        }
-
-        const customers: CustomerRecord[] = [];
-        const locatedCustomers: CustomerRecord[] = [];
-        for (const item of data) {
-          if (!item || typeof item !== 'object') {
+    this.request = this.http
+      .get<CustomerResponse[]>(CUSTOMERS_API_URL, { timeout: 60000 })
+      .subscribe({
+        next: (data) => {
+          if (!Array.isArray(data)) {
             this.showLoadError();
             return;
           }
 
-          const latitude = this.convertCoordinate(item.latitude, 90);
-          const longitude = this.convertCoordinate(item.longitude, 180);
-          const customer: CustomerRecord = {
-            id: item.customer_id,
-            name:
-              typeof item.name === 'string' && item.name.trim() ? item.name.trim() : 'ไม่ระบุชื่อ',
-            phone: item.phone ?? '',
-            address: item.address ?? '',
-            coordinates: null,
-          };
+          const customers: CustomerRecord[] = [];
+          const locatedCustomers: CustomerRecord[] = [];
+          for (const item of data) {
+            if (!item || typeof item !== 'object') {
+              this.showLoadError();
+              return;
+            }
 
-          if (latitude !== null && longitude !== null) {
-            customer.coordinates = [latitude, longitude];
-            locatedCustomers.push(customer);
+            const latitude = this.convertCoordinate(item.latitude, 90);
+            const longitude = this.convertCoordinate(item.longitude, 180);
+            const customer: CustomerRecord = {
+              id: item.customer_id,
+              name:
+                typeof item.name === 'string' && item.name.trim()
+                  ? item.name.trim()
+                  : 'ไม่ระบุชื่อ',
+              phone: item.phone ?? '',
+              address: item.address ?? '',
+              coordinates: null,
+            };
+
+            if (latitude !== null && longitude !== null) {
+              customer.coordinates = [latitude, longitude];
+              locatedCustomers.push(customer);
+            }
+            customers.push(customer);
           }
-          customers.push(customer);
-        }
 
-        this.customers = customers;
-        this.locatedCustomers = locatedCustomers;
-        this.loading = false;
-        this.searchCustomers(this.search, 'loaded');
-      },
-      error: () => this.showLoadError(),
-    });
+          this.customers = customers;
+          this.locatedCustomers = locatedCustomers;
+          this.loading = false;
+          this.searchCustomers(this.search, 'loaded');
+        },
+        error: () => this.showLoadError(),
+      });
   }
 
   // ค้นหาเฉพาะรายชื่อ หมุดบนแผนที่ยังแสดงครบทุกคน

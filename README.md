@@ -13,7 +13,7 @@ currently does not return CORS headers. Restart `npm start` after changing the p
 For deployment, configure the hosting server to forward `/api/customers` to the same
 upstream `/customers` endpoint **before** the SPA fallback. The Angular development
 proxy is not included in the production build. Alternatively, enable CORS for the
-frontend origin on the API and change `CUSTOMERS_API_URL` in `customer-store.ts` to the
+frontend origin on the API and change `CUSTOMERS_API_URL` in `src/app/service/customer.service.ts` to the
 absolute API URL. The map uses OpenStreetMap tiles and keeps their attribution visible.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.5.

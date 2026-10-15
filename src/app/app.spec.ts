@@ -4,7 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { CUSTOMERS_API_URL } from './frontend/owner-page/customer/customer-store';
+import { CUSTOMERS_API_URL } from './service/customer.service';
 
 function customerFixture() {
   return [
@@ -206,7 +206,7 @@ describe('App', () => {
     TestBed.inject(HttpTestingController)
       .expectOne('/api/orders/with-customers')
       .flush([...orders, { ...orders[0], order_id: 4, latitude: '' }]);
-    // getOrders uses async/await; let it finish updating the shared orders before rendering.
+    // loadOrders uses async/await; let it finish updating the shared orders before rendering.
     await Promise.resolve();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;

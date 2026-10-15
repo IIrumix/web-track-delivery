@@ -57,8 +57,8 @@ export class OrderDetailPanel implements AfterViewInit, OnDestroy {
     this.orderMarkers = [];
     this.pinCount = 0;
 
-    for (const order of this.orderSelection.orders) {
-      const coordinates = this.getCoordinates(order);
+    for (const order of this.orderSelection.orders()) {
+      const coordinates = this.orderSelection.getCoordinates(order);
       const quantity = Number(order.quantity);
       if (coordinates === null || ![1, 2, 3].includes(quantity)) continue;
 
@@ -82,20 +82,9 @@ export class OrderDetailPanel implements AfterViewInit, OnDestroy {
     this.showAll();
   }
 
-  // ค่าว่างและพิกัดที่ผิดจะไม่ถูกนำไปสร้างหมุด
-  private getCoordinates(order: OrderResponse): [number, number] | null {
-    if (order.latitude == null || order.longitude == null) return null;
-    if (String(order.latitude).trim() === '' || String(order.longitude).trim() === '') return null;
-    const latitude = Number(order.latitude);
-    const longitude = Number(order.longitude);
-    if (!Number.isFinite(latitude) || Math.abs(latitude) > 90) return null;
-    if (!Number.isFinite(longitude) || Math.abs(longitude) > 180) return null;
-    return [latitude, longitude];
-  }
-
   private goToOrder(order: OrderResponse | null): void {
     if (order === null || this.map === null) return;
-    const coordinates = this.getCoordinates(order);
+    const coordinates = this.orderSelection.getCoordinates(order);
     if (coordinates === null) return;
     this.map.setView(coordinates, 16);
     for (const item of this.orderMarkers) {

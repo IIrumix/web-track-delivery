@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { CustomerStore } from './customer-store';
+import { CustomerService } from '../../../service/customer.service';
 
 @Component({
   imports: [],
@@ -13,7 +13,7 @@ export class Customer implements OnDestroy {
   private dataSubscription: Subscription;
 
   constructor(
-    public store: CustomerStore,
+    public store: CustomerService,
     private changeDetector: ChangeDetectorRef,
   ) {
 

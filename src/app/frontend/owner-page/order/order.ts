@@ -1,6 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Component, inject } from '@angular/core';
 import { OrderSelectionService } from '../../../service/order-selection.service';
 import { OrderResponse } from '../../../model/order-response';
 
@@ -12,24 +10,11 @@ import { OrderResponse } from '../../../model/order-response';
   host: { class: 'block w-3/4 h-full' },
 })
 export class Order {
-  private readonly http = inject(HttpClient);
   private readonly orderSelection = inject(OrderSelectionService);
-  readonly orders = signal<OrderResponse[]>([]);
+  readonly orders = this.orderSelection.orders;
 
   ngOnInit() {
-    this.getOrders();
-  }
-
-  async getOrders() {
-    try {
-      const response = await firstValueFrom(
-        this.http.get<OrderResponse[]>('/api/orders/with-customers'),
-      );
-      this.orders.set(response);
-      this.orderSelection.setOrders(response);
-    } catch (error) {
-      console.error('เรียกข้อมูล orders ไม่สำเร็จ', error);
-    }
+    this.orderSelection.loadOrders();
   }
 
   selectOrder(order: OrderResponse) {
