@@ -1,6 +1,16 @@
 <div class="bg-white border border-[#E4E7EC] w-full h-full rounded-r-2xl flex p-4 overflow-hidden">
     <div class="w-full h-full min-h-0 flex flex-col mt-4"><!-- border border-[#E4E7EC] -->
-        <h1 class="text-[#0F172A] text-xl font-semibold mb-5">ออเด้อร์อาหาร</h1>
+        <div class="flex items-center justify-between mb-5">
+            <h1 class="text-[#0F172A] text-xl font-semibold">ออเด้อร์อาหาร</h1>
+            <button
+                type="button"
+                (click)="simulateOrders()"
+                [disabled]="simulating()"
+                class="rounded-md bg-[#5DD4A8] px-2 py-1 text-xs font-medium text-white hover:bg-[#45bd91] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+                {{ simulating() ? 'กำลังสร้าง...' : 'Simulate order' }}
+            </button>
+        </div>
         <div class="relative mb-5">
             <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0F172A]/62"
                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"

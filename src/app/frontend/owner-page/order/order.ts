@@ -15,6 +15,7 @@ export class Order {
   private readonly http = inject(HttpClient);
   private readonly orderSelection = inject(OrderSelectionService);
   readonly orders = signal<OrderResponse[]>([]);
+  readonly simulating = signal(false);
 
   ngOnInit() {
     this.getOrders();
@@ -25,7 +26,7 @@ export class Order {
       const response = await firstValueFrom(
         this.http.get<OrderResponse[]>('/api/orders/with-customers'),
       );
-      this.orders.set(response);
+      this.orders.set(this.sortOrders(response));
     } catch (error) {
       console.error('เรียกข้อมูล orders ไม่สำเร็จ', error);
     }
@@ -34,4 +35,23 @@ export class Order {
   selectOrder(order: OrderResponse) {
     this.orderSelection.select(order);
   }
+
+  private sortOrders(orders: OrderResponse[]): OrderResponse[] {
+    return [...orders].sort((first, second) => first.order_id - second.order_id);
+  }
+
+  async simulateOrders() {
+    if (this.simulating()) return;
+
+    this.simulating.set(true);
+    try {
+      await firstValueFrom(this.http.post('/api/orders/simulated', null));
+      await this.getOrders();
+    } catch (error) {
+      console.error('สร้าง simulated orders ไม่สำเร็จ', error);
+    } finally {
+      this.simulating.set(false);
+    }
+  }
+
 }
