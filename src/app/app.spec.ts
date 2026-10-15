@@ -22,32 +22,28 @@ describe('App', () => {
     await TestBed.inject(Router).navigateByUrl('/');
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('label')?.textContent).toContain('เลขใบงาน');
-    expect(compiled.querySelector('input')).toBeTruthy();
+    expect(compiled.querySelector('input')?.getAttribute('placeholder')).toBe('กรอกเลขใบงาน');
+    expect(compiled.querySelector('button')?.textContent).toContain('ยืนยัน');
   });
 
-  it('opens the rider work page when a work number is submitted', async () => {
+  it('keeps the rider work route available alongside the incoming routes', async () => {
     const fixture = TestBed.createComponent(App);
-    await TestBed.inject(Router).navigateByUrl('/');
+    await TestBed.inject(Router).navigateByUrl('/rider/67');
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    const input = compiled.querySelector('input')!;
-    input.value = '67';
-    input.dispatchEvent(new Event('input'));
-    compiled.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
-    await fixture.whenStable();
     expect(TestBed.inject(Router).url).toBe('/rider/67');
     expect(compiled.querySelector('h1')?.textContent).toContain('งานส่งของวันนี้');
   });
 
-  it('requires a work number before navigation', async () => {
+  it('renders the incoming driver and owner pages at their routes', async () => {
     const fixture = TestBed.createComponent(App);
-    await TestBed.inject(Router).navigateByUrl('/');
-    await fixture.whenStable();
+    const router = TestBed.inject(Router);
     const compiled = fixture.nativeElement as HTMLElement;
-    compiled.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    await router.navigateByUrl('/driver-gui');
     await fixture.whenStable();
-    expect(TestBed.inject(Router).url).toBe('/');
-    expect(compiled.querySelector('[role="alert"]')?.textContent).toContain('กรุณากรอกเลขใบงาน');
+    expect(compiled.querySelector('app-driver-gui')).toBeTruthy();
+    await router.navigateByUrl('/owner-gui');
+    await fixture.whenStable();
+    expect(compiled.querySelector('app-owner-gui')).toBeTruthy();
   });
 });

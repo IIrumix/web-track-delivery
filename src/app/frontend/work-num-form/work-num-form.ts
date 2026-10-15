@@ -1,25 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  imports: [],
+  imports: [RouterModule],
   selector: 'app-work-num-form',
   styleUrl: './work-num-form.css',
   templateUrl: './work-num-form.html',
 })
 export class WorkNumForm {
-  private readonly router = inject(Router);
-  readonly workNumber = signal('');
-  readonly error = signal('');
 
-  openWork(event: Event): void {
-    event.preventDefault();
-    const workNumber = this.workNumber().trim();
-    if (!workNumber) {
-      this.error.set('กรุณากรอกเลขใบงาน');
-      return;
+  secretKey: string = 'iwantA';
+
+  secretOwnerPage(workNumInput: HTMLInputElement) {
+    if (workNumInput.value === this.secretKey) {
+      window.location.href = '/owner-gui';
+    } else {
+      window.location.href = '/driver-gui';
     }
-    this.error.set('');
-    void this.router.navigate(['/rider', workNumber]);
   }
+
 }
