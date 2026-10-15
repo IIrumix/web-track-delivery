@@ -26,6 +26,7 @@ export class Order {
         this.http.get<OrderResponse[]>('/api/orders/with-customers'),
       );
       this.orders.set(response);
+      this.orderSelection.setOrders(response);
     } catch (error) {
       console.error('เรียกข้อมูล orders ไม่สำเร็จ', error);
     }

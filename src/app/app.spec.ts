@@ -186,4 +186,48 @@ describe('App', () => {
     expect(compiled.querySelector('[role=status]')?.textContent).toContain('2 ออเดอร์ · 2 เสร็จ');
     expect(compiled.querySelectorAll('[data-testid=complete]')).toHaveLength(3);
   });
+
+  it('shows order pins for 1, 2 and 3 boxes below the details and shares selection with the list', async () => {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    const orders = [1, 2, 3].map((quantity) => ({
+      ...customerFixture()[0],
+      order_id: quantity,
+      customer_id: quantity,
+      delivery_date: '2026-10-16',
+      quantity: quantity,
+      unit_price: '100',
+      unit_cost: '50',
+      is_simulated: 0,
+      status: 'pending',
+      latitude: String(16.24 + quantity / 1000),
+    }));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/orders/with-customers')
+      .flush([...orders, { ...orders[0], order_id: 4, latitude: '' }]);
+    // getOrders uses async/await; let it finish updating the shared orders before rendering.
+    await Promise.resolve();
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const panel = compiled.querySelector('app-order-detail-panel')!;
+    expect(panel.querySelectorAll('.leaflet-marker-icon')).toHaveLength(3);
+    for (const quantity of [1, 2, 3]) {
+      expect(panel.querySelector('img[src$="order-pin-' + quantity + '.svg"]')).toBeTruthy();
+    }
+    expect(panel.querySelector('[role=status]')?.textContent).toContain('3 หมุด');
+
+    panel.querySelector<HTMLImageElement>('img[src$="order-pin-2.svg"]')!.click();
+    await fixture.whenStable();
+    expect(panel.querySelector('h3')?.textContent).toContain('Order #2');
+    expect(panel.querySelector('.leaflet-popup-content')?.textContent).toContain('2 กล่อง');
+
+    const thirdOrder = Array.from(
+      compiled.querySelectorAll<HTMLButtonElement>('app-order button'),
+    ).find((button) => button.textContent?.includes('Order #3'))!;
+    thirdOrder.click();
+    await fixture.whenStable();
+    expect(panel.querySelector('h3')?.textContent).toContain('Order #3');
+    expect(panel.querySelector('.leaflet-popup-content')?.textContent).toContain('3 กล่อง');
+  });
 });
