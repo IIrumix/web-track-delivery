@@ -1,5 +1,5 @@
-<div class="bg-[#ECFDF5] w-full h-screen flex justify-center items-center">
-  <div>
+<div class="bg-[#ECFDF5] w-full h-screen flex justify-center items-center font-[family-name:Prompt,sans-serif]">
+  <form (submit)="openWork($event)">
     <div class="flex items-center text-xs text-gray-400 mb-5.5 gap-2 opacity-72">
         <span class="w-1.5 h-1.5 bg-[#98FF98] rounded-full align-bottom"></span>
         <span class="font-normal text-base text-[#0F172A]">ร้านxxxxx</span>
@@ -15,13 +15,17 @@
         <span class="font-light leading-7 text-[#0F172A]">กรอกเลขใบงานเพื่อดำเนินการต่อ</span>
     </div>
     <div class="flex mb-12.5 flex-col gap-3.5">
-        <span class="font-light text-[#0F172A] text-sm">เลขใบงาน</span>
-        <input type="text" placeholder="กรอกเลขใบงาน" class="w-80 h-12 border-b border-[#D1D5DB]  text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-b-2 focus:border-[#98FF98] transition duration-200 ease" />
+        <label for="work-number" class="font-light text-[#0F172A] text-sm">เลขใบงาน</label>
+        <input id="work-number" name="workNumber" type="text" placeholder="กรอกเลขใบงาน" [value]="workNumber()" (input)="workNumber.set($any($event.target).value); error.set('')" [attr.aria-invalid]="error() ? 'true' : null" [attr.aria-describedby]="error() ? 'work-number-error' : null" class="w-80 h-12 border-b border-[#D1D5DB] text-sm text-[#0F172A] placeholder:text-[#9CA3AF] focus:outline-none focus:border-b-2 focus:border-[#98FF98] transition duration-200 ease" />
+        @if (error()) {
+          <span id="work-number-error" role="alert" class="text-sm text-[#B45309]">{{ error() }}</span>
+        }
     </div>
     <div class="mb-12.5">
-      <button class="w-80 h-12 bg-[#FF7A1A] text-[#0F172A] text-sm font-medium hover:bg-[#E06000] transition duration-200 ease">ยืนยัน</button>
+      <button type="submit" class="w-80 h-12 bg-[#FF7A1A] text-[#0F172A] text-sm font-medium hover:bg-[#E06000] transition duration-200 ease">ยืนยัน</button>
     </div>
     <div class="flex mb-11 opacity-72 flex-col">
         <span class="font-normal text-[#0F172A] text-sm"> ระบบจะตรวจสอบเลขใบงานและแสดงรายละเอียดที่เกี่ยวข้องให้ทันที</span>
     </div>
+  </form>
 </div>
