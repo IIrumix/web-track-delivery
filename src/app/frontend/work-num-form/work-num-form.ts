@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   imports: [RouterModule],
@@ -11,11 +11,13 @@ export class WorkNumForm {
 
   secretKey: string = 'iwantA';
 
+  constructor(private router: Router) {}
+
   secretOwnerPage(workNumInput: HTMLInputElement) {
     if (workNumInput.value === this.secretKey) {
-      window.location.href = '/owner-gui';
+      void this.router.navigateByUrl('/owner/customer');
     } else {
-      window.location.href = '/driver-gui';
+      void this.router.navigateByUrl('/driver-gui');
     }
   }
 
