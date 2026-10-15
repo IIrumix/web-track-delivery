@@ -1,9 +1,9 @@
-<main class="min-h-dvh bg-[#ecfdf5] font-[family-name:Prompt,sans-serif] text-[#0f172a]">
-  <div class="mx-auto w-full max-w-[496px] pt-6 pb-10">
+<main class="min-h-dvh bg-[#ecfdf5] font-[Prompt,sans-serif] text-[#0f172a]">
+  <div class="mx-auto w-full max-w-124 pt-6 pb-10">
     <header class="px-6 max-[440px]:px-5">
       <p
         data-testid="work-meta"
-        class="m-0 mb-2 flex items-center gap-[7px] text-[13px] leading-5 text-[#647b96] max-[440px]:text-[11px]"
+        class="m-0 mb-2 flex items-center gap-1.75 text-[13px] leading-5 text-[#647b96] max-[440px]:text-[11px]"
       >
         <span class="size-2 flex-[0_0_8px] rounded-full bg-[#22c55e]" aria-hidden="true"></span>
         {{ job().dateLabel }} - งาน {{ workNumber }} - Rider: {{ job().rider }}
@@ -22,13 +22,13 @@
           {{ job().stops.length }} ออเดอร์ · {{ completedOrders() }} เสร็จ
         </p>
       </div>
-      <div class="mt-2 h-[3px] w-[41px] bg-[#98ff98] max-[440px]:w-[34px]" aria-hidden="true"></div>
+      <div class="mt-2 h-0.75 w-10.25 bg-[#98ff98] max-[440px]:w-8.5" aria-hidden="true"></div>
     </header>
 
     <section aria-labelledby="pickup-title">
       <h2
         id="pickup-title"
-        class="m-0 px-6 pt-[18px] pb-2.5 text-sm leading-[22px] font-normal text-[#647b96] max-[440px]:px-5 max-[440px]:text-xs"
+        class="m-0 px-6 pt-4.5 pb-2.5 text-sm leading-5.5 font-normal text-[#647b96] max-[440px]:px-5 max-[440px]:text-xs"
       >
         รับอาหารที่ร้าน
       </h2>
@@ -37,25 +37,25 @@
           @for (task of job().pickupTasks; track task.id; let first = $first) {
             <li class="border-b border-[#dce6e8]">
               <label
-                class="flex cursor-pointer items-center gap-4 py-[15px] pr-5 pl-6 max-[440px]:gap-3 max-[440px]:py-3 max-[440px]:pr-3 max-[440px]:pl-5"
+                class="flex cursor-pointer items-center gap-4 py-3.75 pr-5 pl-6 max-[440px]:gap-3 max-[440px]:py-3 max-[440px]:pr-3 max-[440px]:pl-5"
               >
                 <input
-                  class="relative m-0 size-6 flex-[0_0_24px] cursor-pointer appearance-none rounded-full border-2 border-[#cbd5e1] bg-white after:absolute after:top-[3px] after:left-[7px] after:hidden after:h-[11px] after:w-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-white after:content-[''] checked:border-[#98ff98] checked:bg-[#98ff98] checked:after:block focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:size-5 max-[440px]:basis-5 max-[440px]:after:top-[2px] max-[440px]:after:left-[5px] max-[440px]:after:h-[9px] max-[440px]:after:w-[5px]"
+                  class="relative m-0 size-6 flex-[0_0_24px] cursor-pointer appearance-none rounded-full border-2 border-[#cbd5e1] bg-white after:absolute after:top-0.75 after:left-1.75 after:hidden after:h-2.75 after:w-1.5 after:rotate-45 after:border-r-2 after:border-b-2 after:border-white after:content-[''] checked:border-[#98ff98] checked:bg-[#98ff98] checked:after:block focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:size-5 max-[440px]:basis-5 max-[440px]:after:top-0.5 max-[440px]:after:left-1.25 max-[440px]:after:h-2.25 max-[440px]:after:w-1.25"
                   type="checkbox"
                   [checked]="task.completed"
                   [disabled]="deliveryStarted()"
                   (change)="togglePickup(task.id)"
                 />
-                <span class="flex min-w-0 flex-col gap-[3px]">
+                <span class="flex min-w-0 flex-col gap-0.75">
                   <span
-                    class="text-base leading-6 font-semibold wrap-anywhere max-[440px]:text-sm max-[440px]:leading-[21px]"
+                    class="text-base leading-6 font-semibold wrap-anywhere max-[440px]:text-sm max-[440px]:leading-5.25"
                     >{{ task.label }}</span
                   >
                   @if (first && !pickupComplete()) {
                     <span
                       data-testid="preparing"
                       data-task-note
-                      class="text-xs leading-[19px] font-medium text-[#ff7a00]"
+                      class="text-xs leading-4.75 font-medium text-[#ff7a00]"
                       >รอดำเนินการ - กำลังเตรียม</span
                     >
                   }
@@ -67,18 +67,18 @@
         @if (pickupComplete()) {
           <p
             data-testid="complete"
-            class="m-0 min-h-[54px] px-12 py-3.5 text-center text-base leading-[25px] font-semibold text-[#2cbd91] max-[440px]:min-h-[45px] max-[440px]:px-10 max-[440px]:py-[11px] max-[440px]:text-sm max-[440px]:leading-[23px]"
+            class="m-0 min-h-13.5 px-12 py-3.5 text-center text-base leading-6.25 font-semibold text-[#2cbd91] max-[440px]:min-h-11.25 max-[440px]:px-10 max-[440px]:py-2.75 max-[440px]:text-sm max-[440px]:leading-5.75"
           >
             เสร็จสิ้น
           </p>
         } @else {
           <button
             type="button"
-            class="m-0 flex min-h-[54px] w-full cursor-pointer items-center justify-between border-0 bg-transparent px-12 py-3.5 text-left text-base leading-[25px] font-semibold text-[#ff7a00] enabled:hover:bg-[#e3f8ed] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:min-h-[45px] max-[440px]:px-10 max-[440px]:py-[11px] max-[440px]:text-sm max-[440px]:leading-[23px]"
+            class="m-0 flex min-h-13.5 w-full cursor-pointer items-center justify-between border-0 bg-transparent px-12 py-3.5 text-left text-base leading-6.25 font-semibold text-[#ff7a00] enabled:hover:bg-[#e3f8ed] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:min-h-11.25 max-[440px]:px-10 max-[440px]:py-2.75 max-[440px]:text-sm max-[440px]:leading-5.75"
             (click)="completePickup()"
           >
             <span>ปิดงานที่ทำแล้ว</span>
-            <span class="text-[26px]" aria-hidden="true">›</span>
+            <span class="text-[26px]" aria-hidden="true">></span>
           </button>
         }
       </div>
@@ -87,11 +87,11 @@
     @for (stop of job().stops; track stop.id; let index = $index) {
       <section [attr.aria-labelledby]="stop.id + '-title'">
         <div
-          class="flex items-center justify-between gap-2 px-6 pt-[13px] pb-2.5 max-[440px]:px-5 max-[440px]:pt-[11px] max-[440px]:pb-2 max-[374px]:flex-wrap"
+          class="flex items-center justify-between gap-2 px-6 pt-3.25 pb-2.5 max-[440px]:px-5 max-[440px]:pt-2.75 max-[440px]:pb-2 max-[374px]:flex-wrap"
         >
           <h2
             [id]="stop.id + '-title'"
-            class="m-0 text-[13px] leading-[22px] font-normal text-[#647b96] max-[440px]:text-[11px]"
+            class="m-0 text-[13px] leading-5.5 font-normal text-[#647b96] max-[440px]:text-[11px]"
           >
             จัดส่ง - จุด {{ index + 1 }} | ลูกค้า: {{ stop.customer }} | Order #{{
               stop.orderNumber
@@ -99,12 +99,12 @@
           </h2>
           <button
             type="button"
-            class="inline-flex shrink-0 cursor-pointer items-center gap-[7px] border-0 bg-transparent px-0 py-[3px] text-sm font-semibold text-[#0f172a] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 max-[440px]:gap-[5px] max-[440px]:text-xs"
+            class="inline-flex shrink-0 cursor-pointer items-center gap-1.75 border-0 bg-transparent px-0 py-0.75 text-sm font-semibold text-[#0f172a] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 max-[440px]:gap-1.25 max-[440px]:text-xs"
             [attr.aria-label]="'ดูตำแหน่งลูกค้า ' + stop.customer"
             (click)="selectedStop.set(stop); locationDialog.showModal()"
           >
             <svg
-              class="size-5 stroke-[#647b96] stroke-[2.5] max-[440px]:size-[17px]"
+              class="size-5 stroke-[#647b96] stroke-[2.5] max-[440px]:size-4.25"
               viewBox="0 0 24 24"
               fill="none"
               aria-hidden="true"
@@ -120,22 +120,22 @@
             @for (task of stop.tasks; track task.id; let first = $first) {
               <li class="border-b border-[#dce6e8]">
                 <label
-                  class="flex cursor-pointer items-center gap-4 py-[15px] pr-5 pl-6 max-[440px]:gap-3 max-[440px]:py-3 max-[440px]:pr-3 max-[440px]:pl-5"
+                  class="flex cursor-pointer items-center gap-4 py-3.75 pr-5 pl-6 max-[440px]:gap-3 max-[440px]:py-3 max-[440px]:pr-3 max-[440px]:pl-5"
                 >
                   <input
-                    class="relative m-0 size-6 flex-[0_0_24px] cursor-pointer appearance-none rounded-full border-2 border-[#cbd5e1] bg-white after:absolute after:top-[3px] after:left-[7px] after:hidden after:h-[11px] after:w-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-white after:content-[''] checked:border-[#98ff98] checked:bg-[#98ff98] checked:after:block focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:size-5 max-[440px]:basis-5 max-[440px]:after:top-[2px] max-[440px]:after:left-[5px] max-[440px]:after:h-[9px] max-[440px]:after:w-[5px]"
+                    class="relative m-0 size-6 flex-[0_0_24px] cursor-pointer appearance-none rounded-full border-2 border-[#cbd5e1] bg-white after:absolute after:top-0.75 after:left-1.75 after:hidden after:h-2.75 after:w-1.5 after:rotate-45 after:border-r-2 after:border-b-2 after:border-white after:content-[''] checked:border-[#98ff98] checked:bg-[#98ff98] checked:after:block focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:size-5 max-[440px]:basis-5 max-[440px]:after:top-0.5 max-[440px]:after:left-1.25 max-[440px]:after:h-2.25 max-[440px]:after:w-1.25"
                     type="checkbox"
                     [checked]="task.completed"
                     [disabled]="!pickupComplete()"
                     (change)="toggleDelivery(stop.id, task.id)"
                   />
-                  <span class="flex min-w-0 flex-col gap-[3px]">
+                  <span class="flex min-w-0 flex-col gap-0.75">
                     <span
-                      class="text-base leading-6 font-semibold wrap-anywhere max-[440px]:text-sm max-[440px]:leading-[21px]"
+                      class="text-base leading-6 font-semibold wrap-anywhere max-[440px]:text-sm max-[440px]:leading-5.25"
                       >{{ task.label }}</span
                     >
                     @if (first && !pickupComplete()) {
-                      <span data-task-note class="text-xs leading-[19px] font-medium text-[#647b96]"
+                      <span data-task-note class="text-xs leading-4.75 font-medium text-[#647b96]"
                         >ยังไม่เริ่ม</span
                       >
                     }
@@ -147,20 +147,20 @@
           @if (allComplete(stop.tasks)) {
             <p
               data-testid="complete"
-              class="m-0 min-h-[54px] px-12 py-3.5 text-center text-base leading-[25px] font-semibold text-[#2cbd91] max-[440px]:min-h-[45px] max-[440px]:px-10 max-[440px]:py-[11px] max-[440px]:text-sm max-[440px]:leading-[23px]"
+              class="m-0 min-h-13.5 px-12 py-3.5 text-center text-base leading-6.25 font-semibold text-[#2cbd91] max-[440px]:min-h-11.25 max-[440px]:px-10 max-[440px]:py-2.75 max-[440px]:text-sm max-[440px]:leading-5.75"
             >
               เสร็จสิ้น
             </p>
           } @else {
             <button
               type="button"
-              class="m-0 flex min-h-[54px] w-full cursor-pointer items-center justify-between border-0 bg-transparent px-12 py-3.5 text-left text-base leading-[25px] font-semibold text-[#ff7a00] enabled:hover:bg-[#e3f8ed] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:min-h-[45px] max-[440px]:px-10 max-[440px]:py-[11px] max-[440px]:text-sm max-[440px]:leading-[23px]"
+              class="m-0 flex min-h-13.5 w-full cursor-pointer items-center justify-between border-0 bg-transparent px-12 py-3.5 text-left text-base leading-6.25 font-semibold text-[#ff7a00] enabled:hover:bg-[#e3f8ed] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#059669] focus-visible:outline-offset-4 disabled:cursor-default max-[440px]:min-h-11.25 max-[440px]:px-10 max-[440px]:py-2.75 max-[440px]:text-sm max-[440px]:leading-5.75"
               [disabled]="!pickupComplete()"
               [attr.title]="!pickupComplete() ? 'รับอาหารที่ร้านให้เสร็จก่อนเริ่มจัดส่ง' : null"
               (click)="completeDelivery(stop.id)"
             >
               <span>ปิดงานที่ทำแล้ว</span>
-              <span class="text-[26px]" aria-hidden="true">›</span>
+              <span class="text-[26px]" aria-hidden="true">></span>
             </button>
           }
         </div>
@@ -170,7 +170,7 @@
 
   <dialog
     #locationDialog
-    class="m-auto w-[min(400px,calc(100%_-_40px))] rounded-lg border border-[#dce6e8] bg-[#ecfdf5] p-6 text-[#0f172a] backdrop:bg-[#0f172a]/35"
+    class="m-auto w-[min(400px,calc(100%-40px))] rounded-lg border border-[#dce6e8] bg-[#ecfdf5] p-6 text-[#0f172a] backdrop:bg-[#0f172a]/35"
     aria-labelledby="location-title"
   >
     @if (selectedStop(); as stop) {
