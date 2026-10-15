@@ -1,13 +1,13 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   OnDestroy,
   ViewChild,
-  effect,
-  inject,
 } from '@angular/core';
 import * as L from 'leaflet';
+import { Subscription } from 'rxjs';
 import { CustomerRecord, CustomerStore } from './customer-store';
 
 @Component({
@@ -16,85 +16,101 @@ import { CustomerRecord, CustomerStore } from './customer-store';
   host: { class: 'flex min-h-0 min-w-0 flex-1' },
 })
 export class CustomerMap implements AfterViewInit, OnDestroy {
-  readonly store = inject(CustomerStore);
-  @ViewChild('mapContainer', { static: true }) private container!: ElementRef<HTMLDivElement>;
-  private map?: L.Map;
-  private group?: L.FeatureGroup;
-  private resizeObserver?: ResizeObserver;
-  private readonly markers = new Map<CustomerRecord['id'], L.Marker>();
-  private readonly pinIcon = L.divIcon({
-    className: '',
-    html: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40" aria-hidden="true"><path d="M16 39S2 24 2 16a14 14 0 1 1 28 0c0 8-14 23-14 23Z" fill="#22c55e" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="5" fill="#fff"/></svg>',
+  @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLDivElement>;
+  private map: L.Map | null = null;
+  private markerGroup: L.FeatureGroup | null = null;
+  private dataSubscription: Subscription;
+  private customerMarkers: { customerId: number | string; marker: L.Marker }[] = [];
+  private pinIcon = L.icon({
+    iconUrl: 'customer-pin.svg',
     iconSize: [32, 40],
     iconAnchor: [16, 40],
     popupAnchor: [0, -35],
   });
 
-  constructor() {
-    effect(() => this.renderCustomers(this.store.locatedCustomers()));
-    effect(() => {
-      const selected = this.store.selectedCustomer();
-      if (selected?.coordinates && this.map) {
-        this.map.setView(selected.coordinates, Math.max(this.map.getZoom(), 16));
-        this.markers.get(selected.id)?.openPopup();
-      }
+  constructor(
+    public store: CustomerStore,
+    private changeDetector: ChangeDetectorRef,
+  ) {
+    this.dataSubscription = this.store.changes.subscribe((action) => {
+      if (action === 'loaded') this.drawCustomerPins();
+      if (action === 'selected') this.goToCustomer(this.store.selectedCustomer);
+      this.changeDetector.markForCheck();
     });
   }
 
   ngAfterViewInit(): void {
-    this.map = L.map(this.container.nativeElement).setView([16.25, 103.25], 12);
+    this.map = L.map(this.mapContainer.nativeElement).setView([16.25, 103.25], 12);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
-    this.group = L.featureGroup().addTo(this.map);
-    this.renderCustomers(this.store.locatedCustomers());
-    if (typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
-      this.resizeObserver.observe(this.container.nativeElement);
-    }
+    this.markerGroup = L.featureGroup().addTo(this.map);
+    this.drawCustomerPins();
+    this.goToCustomer(this.store.selectedCustomer);
   }
 
-  showAll(): void {
-    const bounds = this.group?.getBounds();
-    if (bounds?.isValid()) this.map?.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
-  }
+  // ล้างหมุดเดิมแล้วสร้างจากลูกค้าที่มีพิกัด
+  private drawCustomerPins(): void {
+    if (this.markerGroup === null) return;
+    this.markerGroup.clearLayers();
+    this.customerMarkers = [];
 
-  private renderCustomers(customers: CustomerRecord[]): void {
-    if (!this.group) return;
-    this.group.clearLayers();
-    this.markers.clear();
-    for (const customer of customers) {
-      if (!customer.coordinates) continue;
+    for (const customer of this.store.locatedCustomers) {
+      if (customer.coordinates === null) continue;
       const marker = L.marker(customer.coordinates, {
         icon: this.pinIcon,
         title: customer.name,
-        alt: `ตำแหน่งลูกค้า ${customer.name}`,
-      }).bindPopup(this.popupContent(customer));
+        alt: 'ตำแหน่งลูกค้า ' + customer.name,
+      });
+      marker.bindPopup(this.createPopup(customer));
       marker.on('click', () => this.store.selectCustomer(customer));
-      this.group.addLayer(marker);
-      this.markers.set(customer.id, marker);
+      this.markerGroup.addLayer(marker);
+      this.customerMarkers.push({ customerId: customer.id, marker: marker });
     }
     this.showAll();
   }
 
-  private popupContent(customer: CustomerRecord): HTMLElement {
+  private goToCustomer(customer: CustomerRecord | null): void {
+    if (customer === null || customer.coordinates === null || this.map === null) return;
+    let zoom = 16;
+    if (this.map.getZoom() > zoom) zoom = this.map.getZoom();
+    this.map.setView(customer.coordinates, zoom);
+    for (const item of this.customerMarkers) {
+      if (item.customerId === customer.id) {
+        item.marker.openPopup();
+        break;
+      }
+    }
+  }
+
+  showAll(): void {
+    if (this.map === null || this.markerGroup === null) return;
+    const bounds = this.markerGroup.getBounds();
+    if (bounds.isValid()) {
+      this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+    }
+  }
+
+  private createPopup(customer: CustomerRecord): HTMLElement {
     const popup = document.createElement('div');
     const name = document.createElement('strong');
     name.textContent = customer.name;
-    popup.append(name);
+    popup.appendChild(name);
+
+    // แสดงข้อมูล API เป็นข้อความ เพื่อไม่ให้ถูกตีความเป็น HTML
     for (const value of [customer.address, customer.phone]) {
       if (!value) continue;
       const line = document.createElement('p');
       line.textContent = value;
-      popup.append(line);
+      popup.appendChild(line);
     }
     return popup;
   }
 
   ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
-    this.map?.remove();
+    this.dataSubscription.unsubscribe();
+    if (this.map) this.map.remove();
   }
 }

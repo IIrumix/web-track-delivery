@@ -18,19 +18,19 @@
         type="search"
         placeholder="ค้นหาลูกค้า"
         aria-label="ค้นหาลูกค้า"
-        [value]="store.search()"
-        (input)="store.search.set($any($event.target).value)"
+        [value]="store.search"
+        (input)="store.searchCustomers($any($event.target).value)"
         class="w-full font-normal text-sm bg-[#F8FAFC] pl-8 pr-2 py-1 border-2 rounded-md border-[#E4E7EC]"
       />
     </div>
     <h2 class="text-[#0F172A]/62 text-xs font-semibold mb-5">
-      รายชื่อลูกค้า ({{ store.filteredCustomers().length }})
+      รายชื่อลูกค้า ({{ store.filteredCustomers.length }})
     </h2>
-    <div class="min-h-0 flex-1 space-y-2 overflow-y-auto pb-4" [attr.aria-busy]="store.loading()">
-      @if (store.loading()) {
+    <div class="min-h-0 flex-1 space-y-2 overflow-y-auto pb-4" [attr.aria-busy]="store.loading">
+      @if (store.loading) {
         <p class="text-sm text-[#64748B]" role="status">กำลังโหลดข้อมูลลูกค้า…</p>
-      } @else if (store.error()) {
-        <p class="text-sm text-orange-800">{{ store.error() }}</p>
+      } @else if (store.error) {
+        <p class="text-sm text-orange-800">{{ store.error }}</p>
         <button
           type="button"
           (click)="store.load()"
@@ -39,12 +39,12 @@
           ลองอีกครั้ง
         </button>
       } @else {
-        @for (customer of store.filteredCustomers(); track customer.id) {
+        @for (customer of store.filteredCustomers; track customer.id) {
           <button
             type="button"
             (click)="store.selectCustomer(customer)"
             [disabled]="!customer.coordinates"
-            [attr.aria-pressed]="store.selectedCustomer()?.id === customer.id"
+            [attr.aria-pressed]="store.selectedCustomer?.id === customer.id"
             [attr.aria-label]="'ดูตำแหน่ง ' + customer.name"
             class="block w-full cursor-pointer rounded-lg border border-[#E4E7EC] p-3 text-left transition-colors hover:bg-[#F8FAFC] focus-visible:outline-2 focus-visible:outline-emerald-600 aria-pressed:border-[#2CBD91] aria-pressed:bg-[#ECFDF5] disabled:cursor-default"
           >
@@ -63,7 +63,7 @@
           </button>
         } @empty {
           <p class="text-sm text-[#64748B]" role="status">
-            {{ store.search().trim() ? 'ไม่พบลูกค้าที่ค้นหา' : 'ยังไม่มีข้อมูลลูกค้า' }}
+            {{ store.search.trim() ? 'ไม่พบลูกค้าที่ค้นหา' : 'ยังไม่มีข้อมูลลูกค้า' }}
           </p>
         }
       }
