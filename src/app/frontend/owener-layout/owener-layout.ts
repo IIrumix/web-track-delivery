@@ -2,8 +2,11 @@ import { Component, inject } from '@angular/core';
 import { Router,RouterOutlet } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { CustomerDetailPanel } from '../owner-page/customer/customer-detail-panel/customer-detail-panel';
+import { CustomerMap } from '../owner-page/customer/customer-map';
+import { CustomerStore } from '../owner-page/customer/customer-store';
 @Component({
-  imports: [RouterOutlet,Sidebar,CustomerDetailPanel],
+  imports: [RouterOutlet,Sidebar,CustomerDetailPanel,CustomerMap],
+  providers: [CustomerStore],
   selector: 'app-owener-layout',
   styleUrl: './owener-layout.css',
   templateUrl: './owener-layout.html',

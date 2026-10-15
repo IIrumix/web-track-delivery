@@ -1,5 +1,21 @@
 # WebTrackDelivery
 
+## Customer map
+
+The `/owner/customer` page loads customer records and all valid location pins from
+`https://lunch-delivery-api-7we5.onrender.com/customers`. Latitude and longitude may be
+JSON numbers or decimal strings. Customers without valid coordinates remain in the list.
+
+Run `npm install` and `npm start`, then open `/owner/customer`. The Angular development
+server forwards `/api/customers` through `proxy.conf.json` because the upstream API
+currently does not return CORS headers. Restart `npm start` after changing the proxy.
+
+For deployment, configure the hosting server to forward `/api/customers` to the same
+upstream `/customers` endpoint **before** the SPA fallback. The Angular development
+proxy is not included in the production build. Alternatively, enable CORS for the
+frontend origin on the API and change `CUSTOMERS_API_URL` in `customer-store.ts` to the
+absolute API URL. The map uses OpenStreetMap tiles and keeps their attribution visible.
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.5.
 
 ## Development server

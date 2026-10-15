@@ -7,22 +7,21 @@ import { OwenerLayout } from './frontend/owener-layout/owener-layout';
 
 export const routes: Routes = [
   { path: '', component: WorkNumForm },
-<<<<<<< HEAD
   { path: 'work-num-form', component: WorkNumForm },
-  { path: 'owner-gui', component: OwnerGui },
+  { path: 'owner-gui', redirectTo: 'owner/customer', pathMatch: 'full' },
   { path: 'driver-gui', component: DriverGui },
   {
     path: 'rider/:workNumber',
     loadComponent: () => import('./frontend/rider-work/rider-work').then((m) => m.RiderWork),
-=======
-  { path: 'owner',
+  },
+  {
+    path: 'owner',
     component: OwenerLayout,
     children: [
       { path: '', redirectTo: 'customer', pathMatch: 'full' },
       { path: 'customer', component: Customer },
       { path: 'order', component: Order },
-      { path: 'driver-gui', component: DriverGui }
+      { path: 'driver-gui', component: DriverGui },
     ],
->>>>>>> 4d73076f9f99588527df516111e0ed5653904e25
   },
 ];
