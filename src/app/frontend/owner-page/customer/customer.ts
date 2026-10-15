@@ -16,7 +16,7 @@ export class Customer implements OnDestroy {
     public store: CustomerStore,
     private changeDetector: ChangeDetectorRef,
   ) {
-    // ขอให้ Angular แสดงค่าล่าสุดเมื่อโหลดข้อมูลหรือค้นหาเสร็จ
+
     this.dataSubscription = this.store.changes.subscribe(() => {
       this.changeDetector.markForCheck();
     });
