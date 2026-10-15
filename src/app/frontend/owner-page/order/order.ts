@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   imports: [],
@@ -8,6 +9,5 @@ import { Component } from '@angular/core';
   host: { class: 'block w-3/4 h-full' },
 })
 export class Order {
-  
   
 }
