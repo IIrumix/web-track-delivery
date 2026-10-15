@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CustomerStore } from './customer-store';
 
 @Component({
   imports: [],
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
   templateUrl: './customer.html',
   host: { class: 'block w-3/4 h-full' },
 })
-export class Customer {}
+export class Customer {
+  readonly store = inject(CustomerStore);
+}

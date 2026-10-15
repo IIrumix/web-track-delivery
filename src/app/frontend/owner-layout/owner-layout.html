@@ -14,8 +14,10 @@
 
             
         </div>
-            @if (router.url.startsWith('/owner/order')) {
-                <app-customer-detail-panel class="flex-1 h-full" [selectedData]="selectedItem"></app-customer-detail-panel>
+            @if (router.url.split('?')[0] === '/owner/customer') {
+                <app-customer-detail-panel class="ml-4"></app-customer-detail-panel>
+            } @else if (router.url.startsWith('/owner/order')) {
+                <app-order-detail-panel class="flex-1 h-full" [selectedData]="selectedItem"></app-order-detail-panel>
             }
     </div>
 </div>
