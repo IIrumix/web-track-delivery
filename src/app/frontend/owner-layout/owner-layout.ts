@@ -8,8 +8,8 @@ import { CustomerStore } from '../owner-page/customer/customer-store';
   imports: [RouterOutlet,Sidebar,CustomerDetailPanel,CustomerMap],
   providers: [CustomerStore],
   selector: 'app-owener-layout',
-  styleUrl: './owener-layout.css',
-  templateUrl: './owener-layout.html',
+  styleUrl: './owner-layout.css',
+  templateUrl: './owner-layout.html',
 })
 export class OwnerLayout {
   router = inject(Router);

@@ -16,7 +16,7 @@ export const routes: Routes = [
   },
   {
     path: 'owner',
-    component: OwenerLayout,
+    component: OwnerLayout,
     children: [
       { path: '', redirectTo: 'customer', pathMatch: 'full' },
       { path: 'customer', component: Customer },
