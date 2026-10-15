@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { OrderSelectionService } from '../../../../service/order-selection.service';
 
 @Component({
   imports: [],
@@ -7,11 +8,14 @@ import { Component, Input } from '@angular/core';
   templateUrl: './order-detail-panel.html',
 })
 export class OrderDetailPanel {
-  @Input() selectedData: any = null;
+  @Input() selectedData: unknown = null;
+  private readonly orderSelection = inject(OrderSelectionService);
+  readonly order = this.orderSelection.selectedOrder;
 
-  orderNumber: string = '1';
-  customerName: string = 'llrumix (บ้านเลขที่ 1234)';
-  foodItem: string = 'มันฝรั่งอบกรอบ หน้าแซลมอนรมควัน และ คาเวียร์ x2';
-  quantity: number = 2;
-  profit: number = 50;
+  get profit(): number {
+    const order = this.order();
+    if (!order) return 0;
+
+    return (+order.unit_price - +order.unit_cost) * order.quantity;
+  }
 }

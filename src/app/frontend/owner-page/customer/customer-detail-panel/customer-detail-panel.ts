@@ -8,14 +8,14 @@ import {
   inject,
 } from '@angular/core';
 import * as L from 'leaflet';
-import { CustomerRecord, CustomerStore } from './customer-store';
+import { CustomerRecord, CustomerStore } from '../customer-store';
 
 @Component({
-  selector: 'app-customer-map',
-  templateUrl: './customer-map.html',
+  selector: 'app-customer-detail-panel',
+  templateUrl: './customer-detail-panel.html',
   host: { class: 'flex min-h-0 min-w-0 flex-1' },
 })
-export class CustomerMap implements AfterViewInit, OnDestroy {
+export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
   readonly store = inject(CustomerStore);
   @ViewChild('mapContainer', { static: true }) private container!: ElementRef<HTMLDivElement>;
   private map?: L.Map;
