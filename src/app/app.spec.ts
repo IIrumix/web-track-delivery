@@ -4,7 +4,7 @@ import { provideRouter, Router } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { CUSTOMERS_API_URL } from './frontend/owner-page/customer/customer-store';
+import { CUSTOMERS_API_URL } from './service/customer.service';
 
 function customerFixture() {
   return [
@@ -74,9 +74,11 @@ describe('App', () => {
     TestBed.inject(HttpTestingController).expectOne(CUSTOMERS_API_URL).flush(customerFixture());
     await fixture.whenStable();
     expect(router.url).toBe('/owner/customer');
-    expect(compiled.querySelector('app-owener-layout')).toBeTruthy();
+    expect(compiled.querySelector('app-owner-layout')).toBeTruthy();
     expect(compiled.querySelector('app-customer')).toBeTruthy();
     await router.navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/orders/with-customers').flush([]);
     await fixture.whenStable();
     expect(compiled.querySelector('app-order')).toBeTruthy();
   });
@@ -89,7 +91,7 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelectorAll('.leaflet-marker-icon')).toHaveLength(2);
-    expect(compiled.querySelector('app-customer-map')?.textContent).toContain('2 หมุด');
+    expect(compiled.querySelector('app-customer-detail-panel')?.textContent).toContain('2 หมุด');
     compiled.querySelector<HTMLButtonElement>('button[aria-label="ดูตำแหน่ง ทดสอบ A"]')!.click();
     await fixture.whenStable();
     expect(compiled.querySelector('.leaflet-popup-content')?.textContent).toContain('จุดส่ง A');
@@ -101,6 +103,8 @@ describe('App', () => {
     expect(compiled.querySelectorAll('app-customer button[aria-pressed]')).toHaveLength(1);
     expect(compiled.querySelectorAll('.leaflet-marker-icon')).toHaveLength(2);
     await TestBed.inject(Router).navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/orders/with-customers').flush([]);
     await fixture.whenStable();
     await TestBed.inject(Router).navigateByUrl('/owner/customer');
     fixture.detectChanges();
@@ -141,7 +145,9 @@ describe('App', () => {
     expect(compiled.querySelector('[role=alert]')?.textContent).toContain(
       'โหลดข้อมูลลูกค้าไม่สำเร็จ',
     );
-    compiled.querySelector<HTMLButtonElement>('app-customer-map [role=alert] button')!.click();
+    compiled
+      .querySelector<HTMLButtonElement>('app-customer-detail-panel [role=alert] button')!
+      .click();
     http
       .expectOne(CUSTOMERS_API_URL)
       .flush([{ ...customerFixture()[0], name: '<img src=x onerror=alert(1)>' }]);
@@ -179,5 +185,49 @@ describe('App', () => {
     await fixture.whenStable();
     expect(compiled.querySelector('[role=status]')?.textContent).toContain('2 ออเดอร์ · 2 เสร็จ');
     expect(compiled.querySelectorAll('[data-testid=complete]')).toHaveLength(3);
+  });
+
+  it('shows order pins for 1, 2 and 3 boxes below the details and shares selection with the list', async () => {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    const orders = [1, 2, 3].map((quantity) => ({
+      ...customerFixture()[0],
+      order_id: quantity,
+      customer_id: quantity,
+      delivery_date: '2026-10-16',
+      quantity: quantity,
+      unit_price: '100',
+      unit_cost: '50',
+      is_simulated: 0,
+      status: 'pending',
+      latitude: String(16.24 + quantity / 1000),
+    }));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/orders/with-customers')
+      .flush([...orders, { ...orders[0], order_id: 4, latitude: '' }]);
+    // loadOrders uses async/await; let it finish updating the shared orders before rendering.
+    await Promise.resolve();
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const panel = compiled.querySelector('app-order-detail-panel')!;
+    expect(panel.querySelectorAll('.leaflet-marker-icon')).toHaveLength(3);
+    for (const quantity of [1, 2, 3]) {
+      expect(panel.querySelector('img[src$="order-pin-' + quantity + '.svg"]')).toBeTruthy();
+    }
+    expect(panel.querySelector('[role=status]')?.textContent).toContain('3 หมุด');
+
+    panel.querySelector<HTMLImageElement>('img[src$="order-pin-2.svg"]')!.click();
+    await fixture.whenStable();
+    expect(panel.querySelector('h3')?.textContent).toContain('Order #2');
+    expect(panel.querySelector('.leaflet-popup-content')?.textContent).toContain('2 กล่อง');
+
+    const thirdOrder = Array.from(
+      compiled.querySelectorAll<HTMLButtonElement>('app-order button'),
+    ).find((button) => button.textContent?.includes('Order #3'))!;
+    thirdOrder.click();
+    await fixture.whenStable();
+    expect(panel.querySelector('h3')?.textContent).toContain('Order #3');
+    expect(panel.querySelector('.leaflet-popup-content')?.textContent).toContain('3 กล่อง');
   });
 });
