@@ -2,16 +2,17 @@ import { Component, inject } from '@angular/core';
 import { Router,RouterOutlet } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { CustomerDetailPanel } from '../owner-page/customer/customer-detail-panel/customer-detail-panel';
-import { CustomerMap } from '../owner-page/customer/customer-map';
 import { CustomerStore } from '../owner-page/customer/customer-store';
+import { OrderSelectionService } from '../../service/order-selection.service';
+import { OrderDetailPanel } from '../owner-page/order/order-detail-panel/order-detail-panel';
 @Component({
-  imports: [RouterOutlet,Sidebar,CustomerDetailPanel,CustomerMap],
-  providers: [CustomerStore],
-  selector: 'app-owener-layout',
-  styleUrl: './owener-layout.css',
-  templateUrl: './owener-layout.html',
+  imports: [RouterOutlet, Sidebar, CustomerDetailPanel, OrderDetailPanel],
+  providers: [CustomerStore, OrderSelectionService],
+  selector: 'app-owner-layout',
+  styleUrl: './owner-layout.css',
+  templateUrl: './owner-layout.html',
 })
-export class OwenerLayout {
+export class OwnerLayout {
   router = inject(Router);
   selectedItem: any;
 

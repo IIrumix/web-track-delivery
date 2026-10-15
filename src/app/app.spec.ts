@@ -74,9 +74,11 @@ describe('App', () => {
     TestBed.inject(HttpTestingController).expectOne(CUSTOMERS_API_URL).flush(customerFixture());
     await fixture.whenStable();
     expect(router.url).toBe('/owner/customer');
-    expect(compiled.querySelector('app-owener-layout')).toBeTruthy();
+    expect(compiled.querySelector('app-owner-layout')).toBeTruthy();
     expect(compiled.querySelector('app-customer')).toBeTruthy();
     await router.navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/orders/with-customers').flush([]);
     await fixture.whenStable();
     expect(compiled.querySelector('app-order')).toBeTruthy();
   });
@@ -89,7 +91,7 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelectorAll('.leaflet-marker-icon')).toHaveLength(2);
-    expect(compiled.querySelector('app-customer-map')?.textContent).toContain('2 หมุด');
+    expect(compiled.querySelector('app-customer-detail-panel')?.textContent).toContain('2 หมุด');
     compiled.querySelector<HTMLButtonElement>('button[aria-label="ดูตำแหน่ง ทดสอบ A"]')!.click();
     await fixture.whenStable();
     expect(compiled.querySelector('.leaflet-popup-content')?.textContent).toContain('จุดส่ง A');
@@ -101,6 +103,8 @@ describe('App', () => {
     expect(compiled.querySelectorAll('app-customer button[aria-pressed]')).toHaveLength(1);
     expect(compiled.querySelectorAll('.leaflet-marker-icon')).toHaveLength(2);
     await TestBed.inject(Router).navigateByUrl('/owner/order');
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/orders/with-customers').flush([]);
     await fixture.whenStable();
     await TestBed.inject(Router).navigateByUrl('/owner/customer');
     fixture.detectChanges();
@@ -141,7 +145,9 @@ describe('App', () => {
     expect(compiled.querySelector('[role=alert]')?.textContent).toContain(
       'โหลดข้อมูลลูกค้าไม่สำเร็จ',
     );
-    compiled.querySelector<HTMLButtonElement>('app-customer-map [role=alert] button')!.click();
+    compiled
+      .querySelector<HTMLButtonElement>('app-customer-detail-panel [role=alert] button')!
+      .click();
     http
       .expectOne(CUSTOMERS_API_URL)
       .flush([{ ...customerFixture()[0], name: '<img src=x onerror=alert(1)>' }]);
