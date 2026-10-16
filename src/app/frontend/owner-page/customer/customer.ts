@@ -7,7 +7,7 @@ import { CustomerService } from '../../../service/customer.service';
   selector: 'app-customer',
   styleUrl: './customer.css',
   templateUrl: './customer.html',
-  host: { class: 'block w-3/4 h-full' },
+  host: { class: 'z-10 block w-3/4 h-full' },
 })
 export class Customer implements OnDestroy {
   private dataSubscription: Subscription;

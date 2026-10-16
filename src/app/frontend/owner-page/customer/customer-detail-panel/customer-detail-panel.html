@@ -1,8 +1,8 @@
-<section class="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-[#E4E7EC] bg-white"
+<section class="flex h-full min-h-0 w-full flex-col overflow-hidden border border-[#E4E7EC] "
   aria-labelledby="customer-map-title">
-  <header class="flex flex-wrap items-center justify-between gap-3 border-b border-[#E4E7EC] px-5 py-4">
+  <header class="z-10 flex flex-wrap items-center justify-between rounded-2xl gap-3 border-b border-[#E4E7EC] bg-white px-5 py-4">
     <div>
-      <h2 id="customer-map-title" class="text-lg font-semibold text-[#0F172A]">ตำแหน่งลูกค้า</h2>
+      <h2 id="customer-map-title" class="text-lg font-semibold text-[#0F172A] ">ตำแหน่งลูกค้า</h2>
       <p class="mt-1 text-sm text-[#64748B]" role="status" aria-live="polite">
         {{ store.locatedCustomers.length }} หมุด จากลูกค้าทั้งหมด {{ store.customers.length }} คน
       </p>
@@ -13,7 +13,7 @@
     </button>
   </header>
   <div class="relative min-h-90 flex-1">
-    <div #mapContainer class="absolute h-full inset-0 z-0" role="region" aria-label="แผนที่ตำแหน่งลูกค้าทั้งหมด"></div>
+    <div #mapContainer class="fixed h-full inset-0 z-0 pointer-events-auto" role="region" aria-label="แผนที่ตำแหน่งลูกค้าทั้งหมด"></div>
     @if (store.loading) {
     <p role="status"
       class="pointer-events-none absolute top-4 left-14 z-10 rounded-lg bg-white/95 px-4 py-2 text-sm text-[#64748B] shadow-sm">
