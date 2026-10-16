@@ -1,11 +1,21 @@
 <div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pl-4">
   <div class="w-full shrink-0 bg-white border border-[#E4E7EC] rounded-xl p-5 shadow-sm">
-    <div class="flex items-center gap-3 mb-4">
-      <span class="w-2.5 h-2.5 rounded-full bg-[#FF7A1A]"></span>
-      <!-- Dynamic Order Title -->
-      <h3 class="font-bold text-gray-900 text-base">Order #{{ order()?.order_id ?? '-' }}</h3>
-      <!-- Dynamic Customer Info -->
-      <span class="text-gray-500 text-sm"> ลูกค้า: {{ order()?.name ?? 'กรุณาเลือก order' }} </span>
+    <div class="flex mb-4 justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#FF7A1A]"></span>
+        <!-- Dynamic Order Title -->
+        <h3 class="font-bold text-gray-900 text-base">Order #{{ order()?.order_id ?? '-' }}</h3>
+        <!-- Dynamic Customer Info -->
+        <span class="text-gray-500 text-sm"> ลูกค้า: {{ order()?.name ?? 'กรุณาเลือก order' }} </span>
+      </div>
+      <button
+        type="button"
+        [disabled]="!order()"
+        class="cursor-pointer rounded-lg border border-[#D1D5DB] px-3 py-1.5 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
+        aria-label="แก้ไขออเดอร์"
+      >
+        แก้ไข
+      </button>
     </div>
 
     <div class="bg-[#ECFDF5] rounded-xl p-4 mb-4">
@@ -31,7 +41,7 @@
   </div>
   
   <section
-    class="flex min-h-[360px] flex-1 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white shadow-sm"
+    class="flex min-h-90 flex-1 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white shadow-sm"
     aria-labelledby="order-map-title"
   >
     <header
@@ -68,7 +78,7 @@
         แสดงหมุดทั้งหมด
       </button>
     </header>
-    <div class="relative min-h-[280px] flex-1">
+    <div class="relative min-h-70 flex-1">
       <div
         #mapContainer
         class="absolute inset-0 z-0"
