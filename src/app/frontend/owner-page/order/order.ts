@@ -16,6 +16,7 @@ export class Order {
   private readonly orderSelection = inject(OrderSelectionService);
   readonly orders = this.orderSelection.orders;
   readonly simulating = signal(false);
+  readonly deletingOrderId = signal<number | null>(null);
 
   ngOnInit() {
     this.orderSelection.loadOrders();
@@ -36,6 +37,24 @@ export class Order {
       console.error('สร้าง simulated orders ไม่สำเร็จ', error);
     } finally {
       this.simulating.set(false);
+    }
+  }
+
+  async deleteOrder(order: OrderResponse) {
+    const confirmed = window.confirm(`ยืนยันการลบ Order #${order.order_id} หรือไม่?`);
+    if (!confirmed || this.deletingOrderId() !== null) return;
+
+    this.deletingOrderId.set(order.order_id);
+    try {
+      await firstValueFrom(this.http.delete(`/api/orders/${order.order_id}`));
+      if (this.orderSelection.selectedOrder()?.order_id === order.order_id) {
+        this.orderSelection.clearSelection();
+      }
+      await this.orderSelection.loadOrders();
+    } catch (error) {
+      console.error(`ลบ Order #${order.order_id} ไม่สำเร็จ`, error);
+    } finally {
+      this.deletingOrderId.set(null);
     }
   }
 

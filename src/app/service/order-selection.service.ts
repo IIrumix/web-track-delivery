@@ -35,6 +35,11 @@ export class OrderSelectionService {
     this.changes.next('selected');
   }
 
+  clearSelection() {
+    this.selectedOrder.set(null);
+    this.changes.next('selected');
+  }
+
   // ค่าว่างและพิกัดที่ผิดจะไม่ถูกนำไปสร้างหมุด
   getCoordinates(order: OrderResponse): [number, number] | null {
     if (order.latitude == null || order.longitude == null) return null;
