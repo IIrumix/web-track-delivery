@@ -8,6 +8,7 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
 import { OrderSelectionService } from '../../../../service/order-selection.service';
@@ -22,12 +23,14 @@ import { OrderResponse } from '../../../../model/order-response';
 export class OrderDetailPanel implements AfterViewInit, OnDestroy {
   @Input() selectedData: unknown = null;
   private readonly orderSelection = inject(OrderSelectionService);
+  private readonly http = inject(HttpClient);
   readonly order = this.orderSelection.selectedOrder;
   @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLDivElement>;
   private map: L.Map | null = null;
   private markerGroup: L.FeatureGroup | null = null;
   private orderMarkers: { orderId: number; marker: L.Marker }[] = [];
   private dataSubscription: Subscription;
+  private editMode = false;
   pinCount = 0;
 
   constructor(private changeDetector: ChangeDetectorRef) {
@@ -48,6 +51,10 @@ export class OrderDetailPanel implements AfterViewInit, OnDestroy {
     this.markerGroup = L.featureGroup().addTo(this.map);
     this.drawOrderPins();
     this.goToOrder(this.order());
+  }
+
+  ToggleEditOrderMode(){
+    this.editMode = !this.editMode;
   }
 
   // สีหมุดมาจากจำนวนกล่อง โดยรูปหมุดมีตัวเลขกำกับด้วย
