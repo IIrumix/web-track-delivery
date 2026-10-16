@@ -9,10 +9,12 @@
         <span class="text-gray-500 text-sm"> ลูกค้า: {{ order()?.name ?? 'กรุณาเลือก order' }} </span>
       </div>
         <div class="flex gap-1">
-          <button
-            class="cursor-pointer rounded-lg bg-[#ebfdf5] border border-[#3EB489]/40 px-3 py-1.5 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
-          >
-            save</button>
+           @if (editMode) {
+            <button
+              class="cursor-pointer rounded-lg bg-[#ebfdf5] border border-[#3EB489]/40 px-3 py-1.5 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
+            >
+              save</button>
+          }
           <button
             type="button"
             (click)="ToggleEditOrderMode()"
