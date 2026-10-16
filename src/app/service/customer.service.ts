@@ -1,9 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription, tap } from 'rxjs';
 import { CustomerRecord, CustomerResponse } from '../model/customer-response';
 
 export const CUSTOMERS_API_URL = '/api/customers';
+
+export interface CustomerUpdate {
+  name: string;
+  phone: string;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+}
 
 @Injectable()
 export class CustomerService implements OnDestroy {
@@ -94,6 +102,24 @@ export class CustomerService implements OnDestroy {
     if (customer.coordinates === null) return;
     this.selectedCustomer = customer;
     this.changes.next('selected');
+  }
+
+  updateCustomer(customer: CustomerRecord, update: CustomerUpdate): Observable<unknown> {
+    return this.http.put(`${CUSTOMERS_API_URL}/${customer.id}`, update).pipe(tap(() => {
+        const latitude = update.latitude;
+        const longitude = update.longitude;
+        const updated: CustomerRecord = {
+          id: customer.id,
+          name: update.name.trim(),
+          phone: update.phone.trim(),
+          address: update.address.trim(),
+          coordinates: latitude !== null && longitude !== null ? [latitude, longitude] : null,
+        };
+        this.customers = this.customers.map((item) => item.id === customer.id ? updated : item);
+        this.locatedCustomers = this.customers.filter((item) => item.coordinates !== null);
+        if (this.selectedCustomer?.id === customer.id) this.selectedCustomer = updated;
+      this.searchCustomers(this.search);
+    }));
   }
 
   // ป้องกันค่าว่างถูกแปลงเป็นพิกัด 0 และป้องกันพิกัดเกินช่วง
