@@ -5,9 +5,9 @@ import { CustomerDetailPanel } from '../owner-page/customer/customer-detail-pane
 import { CustomerService } from '../../service/customer.service';
 import { OrderSelectionService } from '../../service/order-selection.service';
 import { OrderDetailPanel } from '../owner-page/order/order-detail-panel/order-detail-panel';
-import { RiderDetailPage } from '../owner-page/rider/rider-detail-page/rider-detail-page';
+import { RouteDetailPage } from '../owner-page/route/route-detail-page/route-detail-page';
 @Component({
-  imports: [RouterOutlet, Sidebar, CustomerDetailPanel, OrderDetailPanel, RouterLinkWithHref, RiderDetailPage],
+  imports: [RouterOutlet, Sidebar, CustomerDetailPanel, OrderDetailPanel, RouterLinkWithHref, RouteDetailPage],
   providers: [CustomerService, OrderSelectionService],
   selector: 'app-owner-layout',
   styleUrl: './owner-layout.css',

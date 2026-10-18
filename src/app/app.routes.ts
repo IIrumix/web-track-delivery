@@ -4,7 +4,7 @@ import { DriverGui } from './frontend/driver-gui/driver-gui';
 import { Customer } from './frontend/owner-page/customer/customer';
 import { Order } from './frontend/owner-page/order/order';
 import { OwnerLayout } from './frontend/owner-layout/owner-layout';
-import { Rider } from './frontend/owner-page/rider/rider';
+import { Route } from './frontend/owner-page/route/route';
 
 export const routes: Routes = [
   { path: '', component: WorkNumForm },
@@ -22,7 +22,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'customer', pathMatch: 'full' },
       { path: 'customer', component: Customer },
       { path: 'order', component: Order },
-      { path: 'rider', component: Rider },
+      { path: 'route', component: Route },
     ],
   },
 ];

@@ -1,0 +1,99 @@
+<div class="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-y-auto pl-4">
+    bus
+    @if(!RouteService.confirmRoute()){
+    <div class="w-full shrink-0 bg-white border border-[#E4E7EC] rounded-xl p-5 mt-auto">
+
+        <!-- Top Header Row -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex items-center gap-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FF7A1A]"></span>
+                <h2 class="text-xl font-bold text-slate-900 tracking-wide">งาน 4</h2>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-8 text-[15px]">
+                <div>
+                    <span class="text-slate-500">เวลาจัดส่งรวมโดยประมาณ: </span>
+                    <span class="font-bold text-slate-800">30 นาที</span>
+                </div>
+                <div>
+                    <span class="text-slate-500">เสร็จประมาณ: </span>
+                    <span class="font-bold text-[#2eb872]">11.40 น.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3-Column-->
+        <div class="flex flex-col md:flex-row gap-5 items-stretch justify-between">
+
+            <!--Column 1-->
+            <div class="flex flex-col justify-between w-4/10">
+                <div class="bg-[#ecfbf3] rounded-2xl p-4 mb-3.5">
+                    <div class="text-sm text-slate-500 mb-2.5">รายการอาหาร</div>
+                    <div class="space-y-2 text-[15px]">
+                        <div class="flex justify-between items-center text-slate-800">
+                            <span>Order #4 - ข้าวผัด x2</span>
+                            <span class="font-semibold">2 กล่อง</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-800">
+                            <span>Order #6 - ต้มยำกุ้ง x1</span>
+                            <span class="font-semibold">1 กล่อง</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-1 space-y-2 text-[16px]">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">รวมทั้งหมด</span>
+                        <span class="font-bold text-slate-900">3 กล่อง</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">กำไร / กล่อง</span>
+                        <span class="font-bold text-[#2eb872]">+75 ฿</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Column 2 -->
+            <div class="bg-[#f8fafc] rounded-2xl p-4 flex flex-col justify-between w-3/10">
+                <div class="text-sm text-slate-500 mb-2.5">รายได้รวมจากค่าส่ง</div>
+
+                <div
+                    class="bg-white border border-slate-200/80 rounded-xl p-3.5 flex-1 flex flex-col justify-between text-[15px]">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500">ระยะทางรวม</span>
+                            <span class="font-bold text-slate-800">5 กม.</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500">จำนวนกล่อง</span>
+                            <span class="font-bold text-slate-800">3 กล่อง</span>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-100 my-2.5">
+
+                    <div>
+                        <div class="text-xs text-slate-400 mb-1">ค่าใช้จ่ายRider:</div>
+                        <div class="flex justify-between items-center font-bold text-slate-900">
+                            <span>5 x 3 x 2 =</span>
+                            <span>30 ฿</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Net Profit / Loss -->
+            <div
+                class="bg-[#ecfbf3] rounded-2xl p-5 flex flex-col items-center justify-between text-center min-h-42.5 w-3/10">
+                <div class="text-sm font-medium text-[#2eb872]">กำไร / ขาดทุนสุทธิ</div>
+                <div class="text-4xl font-bold text-[#2eb872] my-2 tracking-tight">+40 ฿</div>
+                <div class="text-xs font-medium text-[#2eb872]">กำไร</div>
+            </div>
+
+        </div>
+    </div>
+    }@else if(RouteService.confirmRoute()){
+        zzzzzzz
+    }
+</div>
