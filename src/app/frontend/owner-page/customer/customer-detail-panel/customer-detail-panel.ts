@@ -37,6 +37,7 @@ export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
     this.dataSubscription = this.store.changes.subscribe((action) => {
       if (action === 'loaded') this.drawCustomerPins();
       if (action === 'selected') this.goToCustomer(this.store.selectedCustomer);
+      if (action === 'show-all') this.showAll();
       this.changeDetector.markForCheck();
     });
   }

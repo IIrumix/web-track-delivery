@@ -70,4 +70,8 @@ export class Customer implements OnDestroy {
   private emptyForm(): CustomerUpdate {
     return { name: '', phone: '', address: '', latitude: 0, longitude: 0 };
   }
+
+  showAll(): void {
+    this.store.showAllCustomers();
+  }
 }
