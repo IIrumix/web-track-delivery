@@ -9,7 +9,7 @@ import { OrderResponse } from '../../../model/order-response';
   selector: 'app-order',
   styleUrl: './order.css',
   templateUrl: './order.html',
-  host: { class: 'block w-3/4 h-full' },
+  host: { class: 'block w-full h-full' },
 })
 export class Order {
   private readonly http = inject(HttpClient);

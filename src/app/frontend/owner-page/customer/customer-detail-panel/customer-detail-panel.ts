@@ -15,7 +15,7 @@ import { CustomerService } from '../../../../service/customer.service';
   selector: 'app-customer-detail-panel',
   templateUrl: './customer-detail-panel.html',
   styleUrl: './customer-detail-panel.css',
-  host: { class: 'flex min-h-0 min-w-0 flex-1' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 pl-4' },
 })
 export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLDivElement>;
