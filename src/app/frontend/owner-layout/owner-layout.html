@@ -39,6 +39,8 @@
             <app-customer-detail-panel></app-customer-detail-panel>
         } @else if (router.url.startsWith('/owner/order')) {
             <app-order-detail-panel class="flex-1 h-full" [selectedData]="selectedItem"></app-order-detail-panel>
+        } @else if (router.url.startsWith('/owner/rider')){
+            <app-rider-detail-page></app-rider-detail-page>
         }
     </div>
 </div>
