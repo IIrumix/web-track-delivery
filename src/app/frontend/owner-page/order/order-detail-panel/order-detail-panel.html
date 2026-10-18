@@ -1,5 +1,5 @@
 <div class="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pl-4">
-  <div class="w-full shrink-0 bg-white border border-[#E4E7EC] rounded-xl p-5 shadow-sm">
+  <div class="w-full shrink-0 bg-white border border-[#E4E7EC] rounded-xl p-5 ">
     <div class="flex mb-4 justify-between">
       <div class="flex items-center gap-3">
         <span class="w-2.5 h-2.5 rounded-full bg-[#FF7A1A]"></span>
@@ -36,7 +36,7 @@
             type="text"
             [value]="order()?.address ?? ''"
             aria-label="ที่อยู่จัดส่ง"
-            class="min-w-0 flex-1 rounded border border-[#D1D5DB] px-2 py-1 text-[#0F172A]"
+            class="min-w-0 flex-1 rounded border border-[#E4E7EC] px-2 py-1 text-[#0F172A]"
           />
           <label class="ml-3 flex shrink-0 items-center gap-1 font-medium">
             <input
@@ -45,7 +45,7 @@
               min="0"
               [value]="order()?.quantity ?? 0"
               aria-label="จำนวนกล่อง"
-              class="w-16 rounded border border-[#D1D5DB] px-2 py-1 text-[#0F172A]"
+              class="w-16 rounded border border-[#E4E7EC] px-2 py-1 text-[#0F172A]"
             />
             กล่อง
           </label>
@@ -70,7 +70,7 @@
   </div>
   
   <section
-    class="flex min-h-90 flex-1 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white shadow-sm"
+    class="flex min-h-90 flex-1 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white"
     aria-labelledby="order-map-title"
   >
     <header

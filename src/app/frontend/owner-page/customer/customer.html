@@ -23,7 +23,7 @@
       } @else {
         @for (customer of store.filteredCustomers; track customer.id) {
           <article class="customer-card relative rounded-lg border border-[#E4E7EC] transition-colors hover:bg-[#F8FAFC]" [class.customer-selected]="store.selectedCustomer?.id === customer.id">
-            <button type="button" (click)="store.selectCustomer(customer)" [disabled]="!customer.coordinates" [attr.aria-pressed]="store.selectedCustomer?.id === customer.id" [attr.aria-label]="'ดูตำแหน่ง ' + customer.name" class="block w-full cursor-pointer p-3 pr-12 text-left focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default">
+            <button type="button" (click)="store.selectCustomer(customer)" [disabled]="!customer.coordinates" [attr.aria-pressed]="store.selectedCustomer?.id === customer.id" [attr.aria-label]="'ดูตำแหน่ง ' + customer.name" class="block w-full cursor-pointer p-3 pr-12 text-left focus-visible:outline-2 focus-visible:outline-[#3EB489] disabled:cursor-default">
               <span class="block text-sm font-medium text-[#0F172A]">{{ customer.name }}</span>
               @if (customer.phone) { <span class="mt-1 block text-xs text-[#64748B]">{{ customer.phone }}</span> }
               @if (customer.address) { <span class="mt-1 block text-xs leading-5 text-[#64748B]">{{ customer.address }}</span> }

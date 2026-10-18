@@ -31,11 +31,11 @@
                 <button
                     type="button"
                     (click)="selectOrder(order)"
-                    class="w-full text-left rounded-xl border border-[#E4E7EC] bg-[#F8FAFC] p-4 shadow-sm flex flex-col hover:border-[#5DD4A8]">
-                    <div class="text-[#0F172A] text-base font-bold">Order #{{ order.order_id }}</div>
-                    <div class="text-[#0F172A]/70 text-sm mt-1">
-                        ลูกค้า : {{ order.name }}
-                    </div>
+                    class="block w-full cursor-pointer rounded-lg border border-[#E4E7EC] p-3 text-left transition-colors hover:bg-[#F8FAFC] focus-visible:outline-2 focus-visible:outline-[#3EB489]">
+                    <span class="block text-sm font-medium text-[#0F172A]">Order #{{ order.order_id }}</span>
+                    <span class="mt-1 block text-xs text-[#64748B]">
+                            ลูกค้า: {{ order.name }}
+                    </span>
                     <!-- <div class="text-[#0F172A]/70 text-sm mt-1">
                         จำนวน: {{ order.quantity }} กล่อง
                     </div>
