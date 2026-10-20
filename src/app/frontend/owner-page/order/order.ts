@@ -14,6 +14,9 @@ import { OrderResponse } from '../../../model/order-response';
 export class Order {
   private readonly http = inject(HttpClient);
   private readonly orderSelection = inject(OrderSelectionService);
+  private addOrder = false;
+  private editError = false;
+  private saving = false;
   readonly orders = this.orderSelection.orders;
   readonly simulating = signal(false);
 
@@ -37,6 +40,10 @@ export class Order {
     } finally {
       this.simulating.set(false);
     }
+  }
+
+  toggleAddOrder(){
+    this.addOrder = !this.addOrder;
   }
 
 }
