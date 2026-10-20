@@ -35,6 +35,14 @@ export class OrderSelectionService {
     this.changes.next('selected');
   }
 
+  async deleteOrder(orderId: number): Promise<void> {
+    await firstValueFrom(this.http.delete(`/api/orders/${orderId}`));
+    if (this.selectedOrder()?.order_id === orderId) {
+      this.selectedOrder.set(null);
+    }
+    this.setOrders(this.orders().filter((order) => order.order_id !== orderId));
+  }
+
   // ค่าว่างและพิกัดที่ผิดจะไม่ถูกนำไปสร้างหมุด
   getCoordinates(order: OrderResponse): [number, number] | null {
     if (order.latitude == null || order.longitude == null) return null;

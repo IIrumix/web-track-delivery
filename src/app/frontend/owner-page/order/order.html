@@ -5,7 +5,7 @@
             <button
                 type="button"
                 (click)="simulateOrders()"
-                [disabled]="simulating()"
+                [disabled]="simulating() || deletingOrderId() !== null"
                 class="rounded-md bg-[#5DD4A8] px-2 py-1 text-xs font-medium text-white hover:bg-[#45bd91] disabled:cursor-not-allowed disabled:opacity-60"
             >
                 {{ simulating() ? 'กำลังสร้าง...' : 'Simulate order' }}
@@ -26,12 +26,20 @@
             <button type="button" class="text-[#0F172A]/70 text-2xl leading-none font-light">+</button>
         </div>
 
+        @if (deleteError()) {
+            <p role="alert" class="mb-3 text-sm text-red-700">{{ deleteError() }}</p>
+        }
+        @if (deleteNotice()) {
+            <p role="status" class="mb-3 text-sm text-emerald-700">{{ deleteNotice() }}</p>
+        }
+
         <div class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2">
             @for (order of orders(); track order.order_id) {
+                <article class="flex items-start rounded-lg border border-[#E4E7EC] transition-colors hover:bg-[#F8FAFC]">
                 <button
                     type="button"
                     (click)="selectOrder(order)"
-                    class="block w-full cursor-pointer rounded-lg border border-[#E4E7EC] p-3 text-left transition-colors hover:bg-[#F8FAFC] focus-visible:outline-2 focus-visible:outline-[#3EB489]">
+                    class="block min-w-0 flex-1 cursor-pointer rounded-lg p-3 text-left focus-visible:outline-2 focus-visible:outline-[#3EB489]">
                     <span class="block text-sm font-medium text-[#0F172A]">Order #{{ order.order_id }}</span>
                     <span class="mt-1 block text-xs text-[#64748B]">
                             ลูกค้า: {{ order.name }}
@@ -43,6 +51,15 @@
                         สถานะ: {{ order.status }}
                     </div> -->
                 </button>
+                <button
+                    type="button"
+                    (click)="deleteOrder(order)"
+                    [disabled]="deletingOrderId() !== null || simulating()"
+                    [attr.aria-label]="'ลบออเดอร์ ' + order.order_id"
+                    class="mt-2 mr-2 shrink-0 cursor-pointer rounded-md px-2 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-red-600 disabled:cursor-wait disabled:opacity-50">
+                    {{ deletingOrderId() === order.order_id ? 'กำลังลบ…' : 'ลบ' }}
+                </button>
+                </article>
             } @empty {
                 <div class="text-[#0F172A]/62 text-sm">ไม่พบข้อมูลออเดอร์</div>
             }
