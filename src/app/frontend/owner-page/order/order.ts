@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { OrderSelectionService } from '../../../service/order-selection.service';
@@ -9,12 +9,23 @@ import { OrderResponse } from '../../../model/order-response';
   selector: 'app-order',
   styleUrl: './order.css',
   templateUrl: './order.html',
-  host: { class: 'block w-3/4 h-full' },
+  host: { class: 'block w-full h-full' },
 })
 export class Order {
   private readonly http = inject(HttpClient);
   private readonly orderSelection = inject(OrderSelectionService);
   readonly orders = this.orderSelection.orders;
+  readonly searchQuery = signal('');
+  readonly filteredOrders = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!query) return this.orders();
+
+    return this.orders().filter(
+      (order) =>
+        `order #${order.order_id}`.includes(query) ||
+        (order.name ?? '').toLowerCase().includes(query),
+    );
+  });
   readonly simulating = signal(false);
   readonly deletingOrderId = signal<number | null>(null);
 

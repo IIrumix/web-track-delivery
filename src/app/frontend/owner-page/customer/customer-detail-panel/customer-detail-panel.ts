@@ -14,7 +14,7 @@ import { CustomerService } from '../../../../service/customer.service';
 @Component({
   selector: 'app-customer-detail-panel',
   templateUrl: './customer-detail-panel.html',
-  host: { class: 'flex min-h-0 min-w-0 flex-1' },
+  host: { class: 'flex min-h-0 min-w-0 flex-1 pl-4' },
 })
 export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLDivElement>;
@@ -36,6 +36,7 @@ export class CustomerDetailPanel implements AfterViewInit, OnDestroy {
     this.dataSubscription = this.store.changes.subscribe((action) => {
       if (action === 'loaded') this.drawCustomerPins();
       if (action === 'selected') this.goToCustomer(this.store.selectedCustomer);
+      if (action === 'show-all') this.showAll();
       this.changeDetector.markForCheck();
     });
   }

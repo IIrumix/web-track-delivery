@@ -4,8 +4,10 @@ import { DriverGui } from './frontend/driver-gui/driver-gui';
 import { Customer } from './frontend/owner-page/customer/customer';
 import { Order } from './frontend/owner-page/order/order';
 import { OwnerLayout } from './frontend/owner-layout/owner-layout';
+import { Route } from './frontend/owner-page/route/route';
 
 export const routes: Routes = [
+  { path: 'test-api', loadComponent: () => import('./frontend/test-api/test-api').then(m => m.TestApi) },
   { path: '', component: WorkNumForm },
   { path: 'work-num-form', component: WorkNumForm },
   { path: 'owner-gui', redirectTo: 'owner/customer', pathMatch: 'full' },
@@ -21,7 +23,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'customer', pathMatch: 'full' },
       { path: 'customer', component: Customer },
       { path: 'order', component: Order },
-      { path: 'driver-gui', component: DriverGui },
+      { path: 'route', component: Route },
     ],
   },
 ];

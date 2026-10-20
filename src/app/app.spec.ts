@@ -5,6 +5,8 @@ import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { CUSTOMERS_API_URL } from './service/customer.service';
+import * as L from 'leaflet';
+import { vi } from 'vitest';
 
 function customerFixture() {
   return [
@@ -92,6 +94,17 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelectorAll('.leaflet-marker-icon')).toHaveLength(2);
     expect(compiled.querySelector('app-customer-detail-panel')?.textContent).toContain('2 หมุด');
+    const fitBounds = vi.spyOn(L.Map.prototype, 'fitBounds');
+    fitBounds.mockClear();
+    compiled.querySelector<HTMLButtonElement>(
+      'app-customer button[aria-label="แสดงตำแหน่งลูกค้าทั้งหมด"]',
+    )!.click();
+    expect(fitBounds).toHaveBeenCalledOnce();
+    expect(fitBounds).toHaveBeenCalledWith(expect.anything(), {
+      padding: [40, 40],
+      maxZoom: 16,
+    });
+
     compiled.querySelector<HTMLButtonElement>('button[aria-label="ดูตำแหน่ง ทดสอบ A"]')!.click();
     await fixture.whenStable();
     expect(compiled.querySelector('.leaflet-popup-content')?.textContent).toContain('จุดส่ง A');

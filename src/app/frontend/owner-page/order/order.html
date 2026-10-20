@@ -18,7 +18,10 @@
                 <circle cx="11" cy="11" r="7" stroke-width="2" />
                 <path stroke-width="2" stroke-linecap="round" d="m16 16 4 4" />
             </svg>
-            <input type="text" placeholder="ค้นหาออเด้อร์หรือลูกค้า"
+            <input #orderSearch type="search" placeholder="ค้นหาออเดอร์หรือลูกค้า"
+                aria-label="ค้นหาออเดอร์หรือลูกค้า"
+                [value]="searchQuery()"
+                (input)="searchQuery.set(orderSearch.value)"
                 class=" w-full font-normal text-sm bg-[#F8FAFC] pl-8 pr-2 py-1 border-2 rounded-md border-[#E4E7EC]" />
         </div>
         <div class="flex items-center justify-between mb-4">
@@ -27,7 +30,7 @@
         </div>
 
         <div class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2">
-            @for (order of orders(); track order.order_id) {
+            @for (order of filteredOrders(); track order.order_id) {
                 <div
                     class="w-full rounded-xl border border-[#E4E7EC] bg-[#F8FAFC] p-4 shadow-sm flex items-center gap-3 hover:border-[#5DD4A8]">
                     <button
@@ -55,7 +58,9 @@
                     </button>
                 </div>
             } @empty {
-                <div class="text-[#0F172A]/62 text-sm">ไม่พบข้อมูลออเดอร์</div>
+                <div class="text-[#0F172A]/62 text-sm" role="status">
+                    {{ searchQuery().trim() ? 'ไม่พบออเดอร์ที่ตรงกับคำค้นหา' : 'ไม่พบข้อมูลออเดอร์' }}
+                </div>
             }
         </div>
     </div>

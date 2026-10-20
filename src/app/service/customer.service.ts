@@ -23,7 +23,7 @@ export class CustomerService implements OnDestroy {
   error = '';
   search = '';
 
-  // แจ้งว่าโหลดลูกค้าเสร็จ (loaded), เลือกลูกค้า (selected) หรือเปลี่ยนสถานะ (updated)
+  // แจ้งการโหลด (loaded), การเลือก (selected), การแสดงหมุดทั้งหมด (show-all) หรือสถานะ (updated)
   changes = new Subject<string>();
   private request?: Subscription;
 
@@ -102,6 +102,10 @@ export class CustomerService implements OnDestroy {
     if (customer.coordinates === null) return;
     this.selectedCustomer = customer;
     this.changes.next('selected');
+  }
+
+  showAllCustomers(): void {
+    this.changes.next('show-all');
   }
 
   updateCustomer(customer: CustomerRecord, update: CustomerUpdate): Observable<unknown> {

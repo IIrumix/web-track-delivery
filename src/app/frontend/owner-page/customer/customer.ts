@@ -9,7 +9,7 @@ import { CustomerService, CustomerUpdate } from '../../../service/customer.servi
   selector: 'app-customer',
   styleUrl: './customer.css',
   templateUrl: './customer.html',
-  host: { class: 'z-10 block w-3/4 h-full' },
+  host: { class: 'z-10 block w-full h-full' },
 })
 export class Customer implements OnDestroy {
   private dataSubscription: Subscription;
@@ -69,5 +69,9 @@ export class Customer implements OnDestroy {
 
   private emptyForm(): CustomerUpdate {
     return { name: '', phone: '', address: '', latitude: 0, longitude: 0 };
+  }
+
+  showAll(): void {
+    this.store.showAllCustomers();
   }
 }
