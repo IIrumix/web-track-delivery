@@ -17,6 +17,7 @@ export class Order {
   private addOrder = false;
   private editError = false;
   private saving = false;
+  private toggleDelete = false
   readonly orders = this.orderSelection.orders;
   readonly simulating = signal(false);
   readonly deletingOrderId = signal<number | null>(null);
@@ -71,6 +72,10 @@ export class Order {
 
   toggleAddOrder(){
     this.addOrder = !this.addOrder;
+  }
+
+  toggleDeleteOrder(){
+    this.toggleDelete =!this.toggleDelete;
   }
 
 }
