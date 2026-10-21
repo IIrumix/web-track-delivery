@@ -17,6 +17,7 @@ export class OwnerLayout {
   router = inject(Router);
   selectedItem: any;
   openlist = true;
+  ownerCod = [16.246063, 103.252125];
 
   updateSelected(item: any) {
     this.selectedItem = item;
