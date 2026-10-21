@@ -6,6 +6,7 @@ import { RouteService } from '../../../service/route.service';
   selector: 'app-route',
   styleUrl: './route.css',
   templateUrl: './route.html',
+  host:{ class: 'block w-full' },
 })
 export class Route {
   RouteService = inject(RouteService);
