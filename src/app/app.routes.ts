@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { WorkNumForm } from './frontend/work-num-form/work-num-form';
-import { DriverGui } from './frontend/driver-gui/driver-gui';
 import { Customer } from './frontend/owner-page/customer/customer';
 import { Order } from './frontend/owner-page/order/order';
 import { OwnerLayout } from './frontend/owner-layout/owner-layout';
@@ -10,7 +9,7 @@ export const routes: Routes = [
   { path: '', component: WorkNumForm },
   { path: 'work-num-form', component: WorkNumForm },
   { path: 'owner-gui', redirectTo: 'owner/customer', pathMatch: 'full' },
-  { path: 'driver-gui', component: DriverGui },
+  { path: 'driver-gui', redirectTo: ({ queryParams }) => 'rider/' + encodeURIComponent(queryParams['workNumber'] || '1'), pathMatch: 'full' },
   {
     path: 'rider/:workNumber',
     loadComponent: () => import('./frontend/rider-work/rider-work').then((m) => m.RiderWork),

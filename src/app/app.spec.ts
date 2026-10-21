@@ -69,7 +69,7 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     await router.navigateByUrl('/driver-gui');
     await fixture.whenStable();
-    expect(compiled.querySelector('app-driver-gui')).toBeTruthy();
+    expect(compiled.querySelector('app-rider-work')).toBeTruthy();
     expect(compiled.querySelector('h1')?.textContent).toContain('งานส่งของวันนี้');
     await router.navigateByUrl('/owner-gui');
     fixture.detectChanges();
@@ -173,7 +173,7 @@ describe('App', () => {
     expect(compiled.querySelector('.leaflet-popup-content img')).toBeNull();
   });
 
-  it('opens the rider UI in driver-gui with the submitted work number', async () => {
+  it('opens rider-work with the submitted work number', async () => {
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);
     await router.navigateByUrl('/');
@@ -182,7 +182,7 @@ describe('App', () => {
     compiled.querySelector('input')!.value = '67';
     compiled.querySelector('button')!.click();
     await fixture.whenStable();
-    expect(router.url).toBe('/driver-gui?workNumber=67');
+    expect(router.url).toBe('/rider/67');
     expect(compiled.querySelector('[data-testid=work-meta]')?.textContent).toContain('งาน 67');
     expect(compiled.querySelectorAll('input:disabled')).toHaveLength(4);
 
