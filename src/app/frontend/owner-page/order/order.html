@@ -5,13 +5,8 @@
             <button
                 type="button"
                 (click)="simulateOrders()"
-<<<<<<< HEAD
-                [disabled]="simulating()"
-                class="rounded-md bg-[#38c28f] px-2 py-1 text-xs font-medium text-white hover:bg-[#45bd91] disabled:cursor-not-allowed disabled:opacity-60"
-=======
                 [disabled]="simulating() || deletingOrderId() !== null || saving()"
-                class="rounded-md bg-[#5DD4A8] px-2 py-1 text-xs font-medium text-white hover:bg-[#45bd91] disabled:cursor-not-allowed disabled:opacity-60"
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
+                class="rounded-md bg-[#38c28f] px-2 py-1 text-xs font-medium text-white hover:bg-[#45bd91] disabled:cursor-not-allowed disabled:opacity-60"
             >
                 {{ simulating() ? 'กำลังสร้าง...' : 'Simulate order' }}
             </button>
@@ -66,40 +61,7 @@
         }
 
         <div class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-2">
-<<<<<<< HEAD
             @for (order of filteredOrders(); track order.order_id) {
-                <div
-                    class="w-full rounded-xl border border-[#E4E7EC] bg-[#F8FAFC] p-4 shadow-sm flex items-center gap-3 hover:border-[#5DD4A8]">
-                    <button
-                        type="button"
-                        (click)="selectOrder(order)"
-                        class="flex-1 text-left">
-                        <div class="text-[#0F172A] text-base font-bold">Order #{{ order.order_id }}</div>
-                        <div class="text-[#0F172A]/70 text-sm mt-1">
-                            ลูกค้า : {{ order.name }}
-                        </div>
-                        <!-- <div class="text-[#0F172A]/70 text-sm mt-1">
-                            จำนวน: {{ order.quantity }} กล่อง
-                        </div>
-                        <div class="text-[#0F172A]/70 text-sm mt-1">
-                            สถานะ: {{ order.status }}
-                        </div> -->
-                    </button>
-                    <button
-                        type="button"
-                        (click)="deleteOrder(order)"
-                        aria-label="ลบออเดอร์"
-                        [disabled]="deletingOrderId() !== null"
-                        class="shrink-0 rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60">
-                        {{ deletingOrderId() === order.order_id ? 'กำลังลบ...' : 'ลบ' }}
-                    </button>
-                </div>
-            } @empty {
-                <div class="text-[#0F172A]/62 text-sm" role="status">
-                    {{ searchQuery().trim() ? 'ไม่พบออเดอร์ที่ตรงกับคำค้นหา' : 'ไม่พบข้อมูลออเดอร์' }}
-                </div>
-=======
-            @for (order of orders(); track order.order_id) {
                 <article class="flex items-start rounded-lg border border-[#E4E7EC] transition-colors hover:bg-[#F8FAFC]">
                 <button
                     type="button"
@@ -129,8 +91,9 @@
             }
                 </article>
             } @empty {
-            <div class="text-[#0F172A]/62 text-sm">ไม่พบข้อมูลออเดอร์</div>
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
+            <div class="text-[#0F172A]/62 text-sm" role="status">
+                {{ searchQuery().trim() ? 'ไม่พบออเดอร์ที่ตรงกับคำค้นหา' : 'ไม่พบข้อมูลออเดอร์' }}
+            </div>
             }
         </div>
         

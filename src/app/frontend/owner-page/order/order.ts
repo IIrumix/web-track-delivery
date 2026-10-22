@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 import { Component, computed, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-=======
-import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
 import { firstValueFrom } from 'rxjs';
 import { OrderSelectionService } from '../../../service/order-selection.service';
 import { CreateOrderRequest, OrderResponse } from '../../../model/order-response';
@@ -44,11 +39,8 @@ export class Order {
   });
   readonly simulating = signal(false);
   readonly deletingOrderId = signal<number | null>(null);
-<<<<<<< HEAD
-=======
   readonly deleteError = signal('');
   readonly deleteNotice = signal('');
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
 
   ngOnInit() {
     this.orderSelection.loadOrders();
@@ -96,26 +88,6 @@ export class Order {
     }
   }
 
-<<<<<<< HEAD
-  async deleteOrder(order: OrderResponse) {
-    const confirmed = window.confirm(`ยืนยันการลบ Order #${order.order_id} หรือไม่?`);
-    if (!confirmed || this.deletingOrderId() !== null) return;
-
-    this.deletingOrderId.set(order.order_id);
-    try {
-      await firstValueFrom(this.http.delete(`/api/orders/${order.order_id}`));
-      if (this.orderSelection.selectedOrder()?.order_id === order.order_id) {
-        this.orderSelection.clearSelection();
-      }
-      await this.orderSelection.loadOrders();
-    } catch (error) {
-      console.error(`ลบ Order #${order.order_id} ไม่สำเร็จ`, error);
-    } finally {
-      this.deletingOrderId.set(null);
-    }
-  }
-
-=======
   toggleAddOrder() {
     if (this.saving() || this.simulating() || this.deletingOrderId() !== null) return;
     this.addOrder = !this.addOrder;
@@ -211,5 +183,4 @@ export class Order {
     this.toggleDelete =!this.toggleDelete;
   }
 
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
 }

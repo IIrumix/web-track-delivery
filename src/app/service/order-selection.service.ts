@@ -37,11 +37,11 @@ export class OrderSelectionService {
     this.changes.next('selected');
   }
 
-<<<<<<< HEAD
   clearSelection() {
     this.selectedOrder.set(null);
     this.changes.next('selected');
-=======
+  }
+
   async createOrder(order: CreateOrderRequest): Promise<number> {
     const response = await firstValueFrom(
       this.http.post<{ affected_row: number; last_idx: number }>('/api/orders', order),
@@ -55,7 +55,6 @@ export class OrderSelectionService {
       this.selectedOrder.set(null);
     }
     this.setOrders(this.orders().filter((order) => order.order_id !== orderId));
->>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
   }
 
   // ค่าว่างและพิกัดที่ผิดจะไม่ถูกนำไปสร้างหมุด
