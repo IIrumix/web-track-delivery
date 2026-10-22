@@ -1,4 +1,39 @@
 <div class="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-y-auto pl-4">
+  <section
+    class="flex min-h-80 shrink-0 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white"
+    aria-labelledby="route-map-title"
+  >
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-[#E4E7EC] px-5 py-3">
+      <div>
+        <h2 id="route-map-title" class="text-base font-semibold text-[#0F172A]">แผนที่เส้นทางจัดส่ง</h2>
+        <p class="mt-1 text-xs text-[#64748B]">แสดงตำแหน่งร้านอาหารและจุดส่งออเดอร์</p>
+      </div>
+      <button
+        type="button"
+        (click)="showAll()"
+        [disabled]="pinCount === 0 && !ownerCod()"
+        class="cursor-pointer rounded-lg border border-[#D1D5DB] px-3 py-2 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
+      >
+        แสดงหมุดทั้งหมด
+      </button>
+    </header>
+    <div class="relative min-h-64 flex-1">
+      <div
+        #mapContainer
+        class="absolute inset-0 z-0"
+        role="region"
+        aria-label="แผนที่เส้นทางจัดส่ง พร้อมตำแหน่งร้านอาหารและจุดส่ง"
+      ></div>
+      <p
+        role="status"
+        aria-live="polite"
+        class="pointer-events-none absolute top-3 right-3 z-10 rounded-lg bg-white/95 px-3 py-2 text-xs text-[#64748B] shadow-sm"
+      >
+        {{ pinCount }} จุดส่ง
+      </p>
+    </div>
+  </section>
+
   @if (!RouteService.confirmRoute()) {
     @if (RouteService.previewPlan(); as preview) {
       <!-- อ่านยอดรวมจาก backend โดยตรง ไม่รวมยอดซ้ำจากการ์ดแต่ละใบงาน -->
