@@ -108,6 +108,13 @@ export class CustomerService implements OnDestroy {
     this.changes.next('show-all');
   }
 
+  createCustomer(customer: CustomerUpdate): Observable<unknown> {
+    return this.http.post(CUSTOMERS_API_URL, customer).pipe(tap(() => {
+      this.search = '';
+      this.load();
+    }));
+  }
+
   updateCustomer(customer: CustomerRecord, update: CustomerUpdate): Observable<unknown> {
     return this.http.put(`${CUSTOMERS_API_URL}/${customer.id}`, update).pipe(tap(() => {
         const latitude = update.latitude;

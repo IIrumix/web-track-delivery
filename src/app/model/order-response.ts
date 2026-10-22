@@ -13,3 +13,13 @@ export interface OrderResponse {
   latitude: string;
   longitude: string;
 }
+
+export interface CreateOrderRequest {
+  customer_id: number;
+  delivery_date: string;
+  quantity: number;
+  unit_price: number;
+  unit_cost: number;
+  is_simulated: number;
+  status: 'ACTIVE';
+}

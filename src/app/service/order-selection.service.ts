@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { OrderResponse } from '../model/order-response';
+import { CreateOrderRequest, OrderResponse } from '../model/order-response';
 import { firstValueFrom, Subject } from 'rxjs';
 
 @Injectable()
@@ -12,14 +12,16 @@ export class OrderSelectionService {
   constructor(private http: HttpClient) {}
 
   // โหลดครั้งเดียวแล้วใช้ข้อมูลชุดเดียวกันทั้งรายชื่อและแผนที่
-  async loadOrders(): Promise<void> {
+  async loadOrders(): Promise<boolean> {
     try {
       const response = await firstValueFrom(
         this.http.get<OrderResponse[]>('/api/orders/with-customers'),
       );
       this.setOrders(response);
+      return true;
     } catch (error) {
       console.error('เรียกข้อมูล orders ไม่สำเร็จ', error);
+      return false;
     }
   }
 
@@ -35,9 +37,25 @@ export class OrderSelectionService {
     this.changes.next('selected');
   }
 
+<<<<<<< HEAD
   clearSelection() {
     this.selectedOrder.set(null);
     this.changes.next('selected');
+=======
+  async createOrder(order: CreateOrderRequest): Promise<number> {
+    const response = await firstValueFrom(
+      this.http.post<{ affected_row: number; last_idx: number }>('/api/orders', order),
+    );
+    return response.last_idx;
+  }
+
+  async deleteOrder(orderId: number): Promise<void> {
+    await firstValueFrom(this.http.delete(`/api/orders/${orderId}`));
+    if (this.selectedOrder()?.order_id === orderId) {
+      this.selectedOrder.set(null);
+    }
+    this.setOrders(this.orders().filter((order) => order.order_id !== orderId));
+>>>>>>> 432d5258c6643c2dd5d45e31708b7e1b781c10e4
   }
 
   // ค่าว่างและพิกัดที่ผิดจะไม่ถูกนำไปสร้างหมุด
