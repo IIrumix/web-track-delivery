@@ -11,12 +11,13 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { OrderSelectionService } from '../../../../service/order-selection.service';
 import { OrderResponse } from '../../../../model/order-response';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  imports: [],
+  imports: [FormsModule],
   selector: 'app-order-detail-panel',
   styleUrl: './order-detail-panel.css',
   templateUrl: './order-detail-panel.html',
@@ -32,7 +33,9 @@ export class OrderDetailPanel implements AfterViewInit, OnDestroy {
   private markerGroup: L.FeatureGroup | null = null;
   private orderMarkers: { orderId: number; marker: L.Marker }[] = [];
   private dataSubscription: Subscription;
-  private editMode = false;
+  editMode = false;
+  saving = false;
+  editQuantity = 0;
   pinCount = 0;
 
   private ownerPinIcon = L.divIcon({
@@ -71,8 +74,44 @@ export class OrderDetailPanel implements AfterViewInit, OnDestroy {
     this.goToOrder(this.order());
   }
 
-  ToggleEditOrderMode(){
+  ToggleEditOrderMode() {
+    if (!this.order()) return;
+
     this.editMode = !this.editMode;
+    if (this.editMode) {
+      this.editQuantity = this.order()?.quantity ?? 0;
+    }
+  }
+
+  async saveOrder() {
+    const order = this.order();
+    if (!order || this.saving) return;
+
+    const quantity = Number(this.editQuantity);
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 3) {
+      console.error('จำนวนกล่องต้องเป็นจำนวนเต็มระหว่าง 1 ถึง 3');
+      return;
+    }
+
+    this.saving = true;
+    try {
+      await firstValueFrom(
+        this.http.put(`/api/orders/${order.order_id}`, {
+          quantity,
+        }),
+      );
+
+      await this.orderSelection.loadOrders();
+      const updatedOrder = this.orderSelection
+        .orders()
+        .find((item) => item.order_id === order.order_id);
+      if (updatedOrder) this.orderSelection.select(updatedOrder);
+      this.editMode = false;
+    } catch (error) {
+      console.error(`บันทึก Order #${order.order_id} ไม่สำเร็จ`, error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   // สีหมุดมาจากจำนวนกล่อง โดยรูปหมุดมีตัวเลขกำกับด้วย

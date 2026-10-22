@@ -8,11 +8,15 @@
         <!-- Dynamic Customer Info -->
         <span class="text-gray-500 text-sm"> ลูกค้า: {{ order()?.name ?? 'กรุณาเลือก order' }} </span>
       </div>
-        <div class="flex">
-           @if (editMode) {
+        <div class="flex items-center gap-2">
+          @if (editMode) {
             <button
-              class="cursor-pointer rounded-lg px-3 py-1.5 text-sm text-[#0F172A] hover:text-[#3EB489] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-[#3EB489] disabled:cursor-default disabled:opacity-50"
+              type="button"
+              (click)="saveOrder()"
+              [disabled]="saving"
+              class="inline-flex items-center gap-2 cursor-pointer rounded-lg bg-[#ebfdf5] border border-[#3EB489]/40 px-3 py-1.5 text-sm text-[#0F172A] hover:text-[#3EB489] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-[#3EB489] disabled:cursor-default disabled:opacity-50 transition-colors"
             >
+              <span>{{ saving ? 'กำลังบันทึก...' : 'บันทึก' }}</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M16.0303 10.0303C16.3232 9.73744 16.3232 9.26256 16.0303 8.96967C15.7374 8.67678 15.2626 8.67678 14.9697 8.96967L10.5 13.4393L9.03033 11.9697C8.73744 11.6768 8.26256 11.6768 7.96967 11.9697C7.67678 12.2626 7.67678 12.7374 7.96967 13.0303L9.96967 15.0303C10.2626 15.3232 10.7374 15.3232 11.0303 15.0303L16.0303 10.0303Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75C17.1086 2.75 21.25 6.89137 21.25 12C21.25 17.1086 17.1086 21.25 12 21.25C6.89137 21.25 2.75 17.1086 2.75 12Z" fill="currentColor"/></svg>
             </button>
           }
@@ -30,10 +34,11 @@
     </div>
 
     <div class="bg-[#ECFDF5] rounded-xl p-4 mb-4">
-      <p class="text-xs text-gray-500 mb-1">รายการอาหาร</p>
+      <p class="text-xs text-gray-500 mb-1">ที่อยู๋จัดส่ง</p>
       <div class="flex justify-between items-center text-sm text-gray-800">
         <!-- Dynamic Food Item & Quantity -->
         @if (editMode) {
+          <span class="min-w-0 flex-1">{{ order()?.address ?? 'ยังไม่ได้เลือก order' }}</span>
           <input
             type="text"
             [value]="order()?.address ?? ''"
@@ -44,8 +49,8 @@
             <input
               type="number"
               max="3"
-              min="0"
-              [value]="order()?.quantity ?? 0"
+              min="1"
+              [(ngModel)]="editQuantity"
               aria-label="จำนวนกล่อง"
               class="w-16 rounded border border-[#E4E7EC] px-2 py-1 text-[#0F172A]"
             />

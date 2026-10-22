@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { OrderResponse } from '../model/order-response';
+import { CreateOrderRequest, OrderResponse } from '../model/order-response';
 import { firstValueFrom, Subject } from 'rxjs';
 
 @Injectable()
@@ -12,14 +12,16 @@ export class OrderSelectionService {
   constructor(private http: HttpClient) {}
 
   // โหลดครั้งเดียวแล้วใช้ข้อมูลชุดเดียวกันทั้งรายชื่อและแผนที่
-  async loadOrders(): Promise<void> {
+  async loadOrders(): Promise<boolean> {
     try {
       const response = await firstValueFrom(
         this.http.get<OrderResponse[]>('/api/orders/with-customers'),
       );
       this.setOrders(response);
+      return true;
     } catch (error) {
       console.error('เรียกข้อมูล orders ไม่สำเร็จ', error);
+      return false;
     }
   }
 
@@ -33,6 +35,18 @@ export class OrderSelectionService {
   select(order: OrderResponse) {
     this.selectedOrder.set(order);
     this.changes.next('selected');
+  }
+
+  clearSelection() {
+    this.selectedOrder.set(null);
+    this.changes.next('selected');
+  }
+
+  async createOrder(order: CreateOrderRequest): Promise<number> {
+    const response = await firstValueFrom(
+      this.http.post<{ affected_row: number; last_idx: number }>('/api/orders', order),
+    );
+    return response.last_idx;
   }
 
   async deleteOrder(orderId: number): Promise<void> {

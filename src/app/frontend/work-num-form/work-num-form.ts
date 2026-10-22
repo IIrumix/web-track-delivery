@@ -17,9 +17,7 @@ export class WorkNumForm {
     if (workNumInput.value === this.secretKey) {
       void this.router.navigateByUrl('/owner/customer');
     } else {
-      void this.router.navigate(['/driver-gui'], {
-        queryParams: { workNumber: workNumInput.value.trim() || '1' },
-      });
+      void this.router.navigate(['/rider', workNumInput.value.trim() || '1']);
     }
   }
 
