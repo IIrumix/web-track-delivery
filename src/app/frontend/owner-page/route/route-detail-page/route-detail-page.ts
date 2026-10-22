@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   ElementRef,
   effect,
   inject,
@@ -22,6 +23,29 @@ import { RouteService } from '../../../../service/route.service';
 export class RouteDetailPage implements AfterViewInit, OnDestroy {
   readonly RouteService = inject(RouteService);
   ownerCod = input<[number, number] | null>(null);
+  readonly selectedJob = computed(() => {
+    const selectedIndex = this.RouteService.selectedJobIndex();
+    if (selectedIndex === null) return null;
+    return this.RouteService.previewPlan()?.jobs[selectedIndex] ?? null;
+  });
+  readonly summary = computed(() => {
+    const plan = this.RouteService.previewPlan();
+    if (plan === null) return null;
+
+    const job = this.selectedJob();
+    if (job === null) return plan.summary;
+
+    return {
+      total_orders: job.stops.length,
+      total_boxes: job.total_boxes,
+      riders: 1,
+      total_distance_km: job.total_distance_km,
+      delivery_cost: job.delivery_cost,
+      revenue: job.revenue,
+      food_cost: job.food_cost,
+      profit: job.profit,
+    };
+  });
 
   @ViewChild('mapContainer', { static: true })
   private mapContainer!: ElementRef<HTMLDivElement>;
@@ -52,6 +76,7 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
       this.ownerCod();
       this.RouteService.previewPlan();
       this.RouteService.routeLines();
+      this.RouteService.selectedJobIndex();
       this.drawOrderPins();
     });
   }
@@ -120,7 +145,10 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
     }
 
     const routeLines = this.RouteService.routeLines();
+    const selectedJobIndex = this.RouteService.selectedJobIndex();
     for (const [jobIndex, job] of plan.jobs.entries()) {
+      if (selectedJobIndex !== null && selectedJobIndex !== jobIndex) continue;
+
       const route = routeLines.find((item) => item.jobIndex === jobIndex);
       if (route !== undefined) {
         const routeCoordinates = this.getRouteCoordinates(route.line);
@@ -199,6 +227,11 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
     if (bounds.isValid()) {
       this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
     }
+  }
+
+  showAllRoutes(): void {
+    this.RouteService.selectedJobIndex.set(null);
+    this.showAll();
   }
 
   ngOnDestroy(): void {

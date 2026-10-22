@@ -15,6 +15,7 @@ export class RouteService {
   readonly jobs = computed(() => this.previewPlan()?.jobs ?? []);
   // ให้หน้าแผนที่อ่านข้อมูลจาก service นี้ได้ แม้เปลี่ยนหน้าแล้วกลับมา
   readonly routeLines = signal<PreviewJobRoute[]>([]);
+  readonly selectedJobIndex = signal<number | null>(null);
   readonly loadingRoutes = signal(false);
   // ล็อกปุ่มตั้งแต่ดึงออเดอร์/คำนวณ preview จนโหลดเส้นทางครบ
   readonly loadingPreview = signal(false);
