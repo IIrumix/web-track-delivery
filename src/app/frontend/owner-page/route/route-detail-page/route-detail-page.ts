@@ -1,8 +1,14 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  effect,
+  inject,
+  input,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import * as L from 'leaflet';
-import { Subscription } from 'rxjs';
-import { OrderResponse } from '../../../../model/order-response';
-import { OrderSelectionService } from '../../../../service/order-selection.service';
 import { RouteService } from '../../../../service/route.service';
 
 @Component({
@@ -14,14 +20,18 @@ import { RouteService } from '../../../../service/route.service';
 })
 export class RouteDetailPage implements AfterViewInit, OnDestroy {
   readonly RouteService = inject(RouteService);
-  private readonly orderSelection = inject(OrderSelectionService);
   ownerCod = input<[number, number] | null>(null);
-  @ViewChild('mapContainer', { static: true }) private mapContainer!: ElementRef<HTMLDivElement>;
+
+  @ViewChild('mapContainer', { static: true })
+  private mapContainer!: ElementRef<HTMLDivElement>;
+
   private map: L.Map | null = null;
   private markerGroup: L.FeatureGroup | null = null;
-  private orderMarkers: { orderId: number; marker: L.Marker }[] = [];
-  private readonly dataSubscription: Subscription;
+  private orderMarkers: L.Marker[] = [];
   pinCount = 0;
+
+  private readonly defaultCenter: L.LatLngTuple = [16.246063, 103.252125];
+
   private readonly ownerPinIcon = L.divIcon({
     className: '',
     html: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48" aria-hidden="true" style="display:block;">
@@ -37,22 +47,39 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
   });
 
   constructor() {
-    this.dataSubscription = this.orderSelection.changes.subscribe((action) => {
-      if (action === 'loaded') this.drawOrderPins();
-      if (action === 'selected') this.goToOrder(this.orderSelection.selectedOrder());
+    effect(() => {
+      this.ownerCod();
+      this.RouteService.previewPlan();
+      this.RouteService.routeLines();
+      this.drawRoutes();
     });
   }
 
   ngAfterViewInit(): void {
-    this.map = L.map(this.mapContainer.nativeElement).setView([16.25, 103.25], 12);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.initMap();
+    this.drawRoutes();
+  }
+
+  private initMap(): void {
+    if (this.map !== null) return;
+
+    this.map = L.map(this.mapContainer.nativeElement, {
+      center: this.ownerCod() ?? this.defaultCenter,
+      zoom: 14,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
+
     this.markerGroup = L.featureGroup().addTo(this.map);
+  }
+
+  private drawRoutes(): void {
+    if (this.map === null || this.markerGroup === null) return;
     this.drawOrderPins();
-    this.goToOrder(this.orderSelection.selectedOrder());
   }
 
   private drawOrderPins(): void {
@@ -71,60 +98,110 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
       this.markerGroup.addLayer(ownerMarker);
     }
 
-    for (const order of this.orderSelection.orders()) {
-      const coordinates = this.orderSelection.getCoordinates(order);
-      const quantity = Number(order.quantity);
-      if (coordinates === null || ![1, 2, 3].includes(quantity)) continue;
+    const plan = this.RouteService.previewPlan();
+    if (plan === null) {
+      this.showAll();
+      return;
+    }
 
-      const marker = L.marker(coordinates, {
-        icon: L.icon({
-          iconUrl: 'order-pin-' + quantity + '.svg',
-          iconSize: [32, 40],
-          iconAnchor: [16, 40],
-          popupAnchor: [0, -35],
+    const origin: [number, number] = [
+      plan.settings.origin.latitude,
+      plan.settings.origin.longitude,
+    ];
+    if (ownerCoordinates === null) {
+      this.markerGroup.addLayer(
+        L.marker(origin, {
+          icon: this.ownerPinIcon,
+          title: 'จุดเริ่มต้นเส้นทาง',
+          alt: 'จุดเริ่มต้นเส้นทาง',
         }),
-        title: 'Order #' + order.order_id + ' - ' + quantity + ' กล่อง',
-        alt: 'ออเดอร์ ' + order.order_id + ' จำนวน ' + quantity + ' กล่อง',
-      });
-      marker.bindPopup(this.createPopup(order));
-      marker.on('click', () => this.orderSelection.select(order));
-      this.markerGroup.addLayer(marker);
-      this.orderMarkers.push({ orderId: order.order_id, marker });
-      this.pinCount++;
+      );
+    }
+
+    const routeLines = this.RouteService.routeLines();
+    for (const [jobIndex, job] of plan.jobs.entries()) {
+      const route = routeLines.find((item) => item.jobIndex === jobIndex);
+      if (route !== undefined) {
+        const routeCoordinates = this.getRouteCoordinates(route.line);
+        if (routeCoordinates.length > 1) {
+          L.polyline(routeCoordinates, {
+            color: this.getJobColor(jobIndex),
+            weight: 4,
+            opacity: 0.8,
+          }).addTo(this.markerGroup);
+        }
+      }
+
+      for (const [stopIndex, stop] of job.stops.entries()) {
+        const coordinates: [number, number] = [stop.order.latitude, stop.order.longitude];
+        const marker = L.marker(coordinates, {
+          icon: L.icon({
+            iconUrl: 'order-pin-' + ((stopIndex % 3) + 1) + '.svg',
+            iconSize: [32, 40],
+            iconAnchor: [16, 40],
+          }),
+          title: 'ใบงาน ' + (jobIndex + 1) + ' - Order #' + stop.order.order_id,
+          alt: 'จุดส่งที่ ' + (stopIndex + 1) + ' ใบงาน ' + (jobIndex + 1),
+        });
+        this.markerGroup.addLayer(marker);
+        this.orderMarkers.push(marker);
+        this.pinCount++;
+      }
     }
     this.showAll();
   }
 
-  private goToOrder(order: OrderResponse | null): void {
-    if (order === null || this.map === null) return;
-    const coordinates = this.orderSelection.getCoordinates(order);
-    if (coordinates === null) return;
-    this.map.setView(coordinates, 16);
-    this.orderMarkers.find((item) => item.orderId === order.order_id)?.marker.openPopup();
+  private getRouteCoordinates(line: unknown): L.LatLngExpression[] {
+    const route = line as {
+      coordinates?: unknown;
+      geometry?: { coordinates?: unknown };
+      features?: { geometry?: { coordinates?: unknown } }[];
+      routes?: { geometry?: { coordinates?: unknown } }[];
+    };
+    const coordinates =
+      route?.coordinates ??
+      route?.geometry?.coordinates ??
+      route?.features?.[0]?.geometry?.coordinates ??
+      route?.routes?.[0]?.geometry?.coordinates;
+    if (!Array.isArray(coordinates)) return [];
+
+    return coordinates.flatMap((point): L.LatLngExpression[] => {
+      if (
+        Array.isArray(point) &&
+        point.length >= 2 &&
+        point.every((value) => typeof value === 'number')
+      ) {
+        // GeoJSON coordinates are [longitude, latitude].
+        return [[point[1] as number, point[0] as number]];
+      }
+      if (
+        typeof point === 'object' &&
+        point !== null &&
+        'latitude' in point &&
+        'longitude' in point
+      ) {
+        const coordinate = point as { latitude: number; longitude: number };
+        return [[coordinate.latitude, coordinate.longitude]];
+      }
+      return [];
+    });
+  }
+
+  private getJobColor(index: number): string {
+    const colors = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c'];
+    return colors[index % colors.length];
   }
 
   showAll(): void {
     if (this.map === null || this.markerGroup === null) return;
     const bounds = this.markerGroup.getBounds();
-    if (bounds.isValid()) this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
-  }
-
-  private createPopup(order: OrderResponse): HTMLElement {
-    const popup = document.createElement('div');
-    const title = document.createElement('strong');
-    title.textContent = 'Order #' + order.order_id;
-    popup.appendChild(title);
-    for (const value of [order.name, order.quantity + ' กล่อง', order.address, order.phone]) {
-      if (!value) continue;
-      const line = document.createElement('p');
-      line.textContent = value;
-      popup.appendChild(line);
+    if (bounds.isValid()) {
+      this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
     }
-    return popup;
   }
 
   ngOnDestroy(): void {
-    this.dataSubscription.unsubscribe();
     this.map?.remove();
+    this.map = null;
   }
 }
