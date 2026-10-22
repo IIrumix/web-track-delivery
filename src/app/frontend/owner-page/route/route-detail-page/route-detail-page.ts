@@ -6,6 +6,7 @@ import {
   inject,
   input,
   OnDestroy,
+  signal,
   ViewChild,
 } from '@angular/core';
 import * as L from 'leaflet';
@@ -27,8 +28,8 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
 
   private map: L.Map | null = null;
   private markerGroup: L.FeatureGroup | null = null;
-  private orderMarkers: L.Marker[] = [];
-  pinCount = 0;
+  private orderMarkers: { orderId: number; marker: L.Marker }[] = [];
+  pinCount = signal(0);
 
   private readonly defaultCenter: L.LatLngTuple = [16.246063, 103.252125];
 
@@ -51,16 +52,15 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
       this.ownerCod();
       this.RouteService.previewPlan();
       this.RouteService.routeLines();
-      this.drawRoutes();
+      this.drawOrderPins();
     });
   }
 
   ngAfterViewInit(): void {
-    this.initMap();
     this.drawRoutes();
   }
 
-  private initMap(): void {
+  private drawRoutes(): void {
     if (this.map !== null) return;
 
     this.map = L.map(this.mapContainer.nativeElement, {
@@ -75,18 +75,19 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.markerGroup = L.featureGroup().addTo(this.map);
-  }
-
-  private drawRoutes(): void {
-    if (this.map === null || this.markerGroup === null) return;
     this.drawOrderPins();
+
+    setTimeout(() => {
+      this.map?.invalidateSize();
+      this.showAll();
+    }, 100);
   }
 
   private drawOrderPins(): void {
     if (this.markerGroup === null) return;
     this.markerGroup.clearLayers();
     this.orderMarkers = [];
-    this.pinCount = 0;
+    this.pinCount.set(0);
 
     const ownerCoordinates = this.ownerCod();
     if (ownerCoordinates !== null) {
@@ -144,8 +145,8 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
           alt: 'จุดส่งที่ ' + (stopIndex + 1) + ' ใบงาน ' + (jobIndex + 1),
         });
         this.markerGroup.addLayer(marker);
-        this.orderMarkers.push(marker);
-        this.pinCount++;
+        this.orderMarkers.push({ orderId: stop.order.order_id, marker });
+        this.pinCount.update((c) => c + 1);
       }
     }
     this.showAll();

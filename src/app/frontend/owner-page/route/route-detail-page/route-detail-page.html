@@ -11,7 +11,7 @@
       <button
         type="button"
         (click)="showAll()"
-        [disabled]="pinCount === 0 && !ownerCod()"
+        [disabled]="pinCount() === 0 && !ownerCod()"
         class="cursor-pointer rounded-lg border border-[#D1D5DB] px-3 py-2 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
       >
         แสดงหมุดทั้งหมด
@@ -29,7 +29,7 @@
         aria-live="polite"
         class="pointer-events-none absolute top-3 right-3 z-10 rounded-lg bg-white/95 px-3 py-2 text-xs text-[#64748B] shadow-sm"
       >
-        {{ pinCount }} จุดส่ง
+        {{ pinCount() }} จุดส่ง
       </p>
     </div>
   </section>

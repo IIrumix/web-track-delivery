@@ -24,12 +24,7 @@ export class RouteService {
   readonly seenPlanSignatures = signal<string[]>([]);
   readonly planMessage = signal<string | null>(null);
 
-  constructor(private http: HttpClient) {
-
-    // เรียกใช้ข้อมูลจำลองทันทีตอนเปิดแอป (ลบออกได้เมื่อต่อ API จริง)
-    this.loadMockData();
-
-  }
+  constructor(private http: HttpClient) {}
 
   toggleConfirmRoute() {
     this.confirmRoute.update((current) => !current);
@@ -113,96 +108,4 @@ export class RouteService {
     return this.http.post<DeliveryPlan>('/api/job-sheets/preview', requestBody);
   }
 
-  loadMockData() {
-    const origin = {
-      latitude: 16.246063,
-      longitude: 103.252125,
-    };
-
-    const mockPlan: DeliveryPlan = {
-      settings: {
-        delivery_date: '2026-10-22',
-        origin,
-        departure_time: '11:30',
-        deadline_time: '12:30',
-        speed_kmh: 30,
-        service_minutes: 2,
-        fixed_cost: 15,
-        cost_per_km_per_box: 2,
-        return_to_shop: false,
-      },
-      jobs: [
-        {
-          // ใบงานที่ 1 (เส้นสีน้ำเงิน) - 2 จุดส่ง
-          stops: [
-            {
-              order: {
-                order_id: 101,
-                latitude: 16.2495,
-                longitude: 103.2485,
-              },
-            },
-            {
-              order: {
-                order_id: 102,
-                latitude: 16.2535,
-                longitude: 103.2445,
-              },
-            },
-          ],
-        },
-        {
-          // ใบงานที่ 2 (เส้นสีแดง) - 2 จุดส่ง
-          stops: [
-            {
-              order: {
-                order_id: 103,
-                latitude: 16.2432,
-                longitude: 103.2568,
-              },
-            },
-            {
-              order: {
-                order_id: 104,
-                latitude: 16.2395,
-                longitude: 103.2612,
-              },
-            },
-          ],
-        },
-      ],
-    } as unknown as DeliveryPlan;
-
-    // จำลองเส้นทาง (GeoJSON coordinates ใช้รูปแบบ [longitude, latitude])
-    const mockRoutes: PreviewJobRoute[] = [
-      {
-        jobIndex: 0,
-        line: {
-          coordinates: [
-            [103.252125, 16.246063], // จุดเริ่มต้น (ร้าน)
-            [103.2508, 16.2472],
-            [103.2498, 16.2483],
-            [103.2485, 16.2495],   // จุดส่งที่ 1 (Order #101)
-            [103.2468, 16.2512],
-            [103.2445, 16.2535],   // จุดส่งที่ 2 (Order #102)
-          ],
-        } as unknown as RouteLine,
-      },
-      {
-        jobIndex: 1,
-        line: {
-          coordinates: [
-            [103.252125, 16.246063], // จุดเริ่มต้น (ร้าน)
-            [103.2542, 16.2448],
-            [103.2568, 16.2432],   // จุดส่งที่ 1 (Order #103)
-            [103.2589, 16.2415],
-            [103.2612, 16.2395],   // จุดส่งที่ 2 (Order #104)
-          ],
-        } as unknown as RouteLine,
-      },
-    ];
-
-    this.previewPlan.set(mockPlan);
-    this.routeLines.set(mockRoutes);
-  }
 }
