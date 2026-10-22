@@ -1,4 +1,4 @@
-import { Component, inject,} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouteService } from '../../../../service/route.service';
 
 @Component({

@@ -1,5 +1,17 @@
 export type Coordinates = { latitude: number; longitude: number };
 
+// GeoJSON จาก /route เรียงพิกัดเป็น [longitude, latitude]
+export interface RouteLine {
+  type: 'LineString';
+  coordinates: [number, number][];
+}
+
+export interface PreviewJobRoute {
+  // อ้างอิง jobs()[jobIndex] ของ preview นี้ ยังไม่ใช่ job_id ในฐานข้อมูล
+  jobIndex: number;
+  line: RouteLine;
+}
+
 export interface PlanningOrder extends Coordinates {
   order_id: number;
   customer_id: number;
@@ -47,6 +59,9 @@ export interface PlannedJob {
 }
 
 export interface DeliveryPlan {
+  // Backend ออกให้ตอน preview: ใช้ยืนยันแผนและตรวจเวลาหมดอายุ
+  preview_id: string;
+  expires_at: string;
   settings: PlanningSettings;
   jobs: PlannedJob[];
   summary: {
