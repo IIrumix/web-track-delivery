@@ -1,14 +1,14 @@
-<section class="flex h-full min-h-0 w-full flex-col overflow-hidden border border-[#E4E7EC] "
+<section class="relative flex h-full min-h-0 w-full flex-col overflow-hidden border border-[#E4E7EC]"
   aria-labelledby="customer-map-title">
-  <header class="z-10 flex flex-wrap items-center justify-between rounded-2xl gap-3 border-b border-[#E4E7EC] bg-white px-5 py-4">
-    <div>
-      <h2 id="customer-map-title" class="text-lg font-semibold text-[#0F172A] ">ตำแหน่งลูกค้า</h2>
-      <p class="mt-1 text-sm text-[#64748B]" role="status" aria-live="polite">
+  <header class="absolute right-2 top-2 z-10 flex max-w-65 items-center justify-between gap-2 rounded-lg border border-white/70 bg-white/90 px-2.5 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_6px_18px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+    <div class="min-w-0">
+      <h2 id="customer-map-title" class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#0F172A]">ตำแหน่งลูกค้า</h2>
+      <p class="mt-0.5 text-[9px] leading-3 text-[#64748B]" role="status" aria-live="polite">
         {{ store.locatedCustomers.length }} หมุด จากลูกค้าทั้งหมด {{ store.customers.length }} คน
       </p>
     </div>
     <button type="button" (click)="showAll()" [disabled]="!store.locatedCustomers.length"
-      class="cursor-pointer rounded-lg border border-[#D1D5DB] px-3 py-2 text-sm font-medium text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50">
+      class="shrink-0 self-center cursor-pointer rounded-md border border-[#D1D5DB] bg-white px-2 py-1 text-[9px] font-medium text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50">
       แสดงหมุดทั้งหมด
     </button>
   </header>
