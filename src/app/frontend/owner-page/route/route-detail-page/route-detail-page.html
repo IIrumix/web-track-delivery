@@ -1,5 +1,70 @@
 <div class="flex h-full min-w-0 flex-1 flex-col gap-4 overflow-y-auto pl-4">
-    bus
+
+
+
+    
+     <section
+    class="flex min-h-90 flex-1 flex-col overflow-hidden rounded-xl border border-[#E4E7EC] bg-white"
+    aria-labelledby="order-map-title"
+  >
+    <header
+      class="flex flex-wrap items-center justify-between gap-3 border-b border-[#E4E7EC] px-5 py-3"
+    >
+      <div>
+        <h2 id="order-map-title" class="text-base font-semibold text-[#0F172A]">
+          ตำแหน่งจัดส่งออเดอร์
+        </h2>
+        <div
+          class="mt-2 flex flex-wrap gap-4 text-xs text-[#64748B]"
+          aria-label="สีหมุดตามจำนวนกล่อง"
+        >
+          <span class="flex items-center gap-1.5"
+            ><span class="size-2.5 rounded-full bg-[#22c55e]" aria-hidden="true"></span>1
+            กล่อง</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="size-2.5 rounded-full bg-[#ff7a1a]" aria-hidden="true"></span>2
+            กล่อง</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="size-2.5 rounded-full bg-[#8b5cf6]" aria-hidden="true"></span>3
+            กล่อง</span
+          >
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="showAll()"
+        [disabled]="pinCount === 0"
+        class="cursor-pointer rounded-lg border border-[#D1D5DB] px-3 py-2 text-sm text-[#0F172A] hover:bg-[#ECFDF5] focus-visible:outline-2 focus-visible:outline-emerald-600 disabled:cursor-default disabled:opacity-50"
+      >
+        แสดงหมุดทั้งหมด
+      </button>
+    </header>
+    <div class="relative min-h-70 flex-1">
+      <div
+        #mapContainer
+        class="absolute inset-0 z-0"
+        role="region"
+        aria-label="แผนที่ออเดอร์ตามจำนวนกล่อง"
+      ></div>
+      <p
+        role="status"
+        aria-live="polite"
+        class="pointer-events-none absolute top-3 right-3 z-10 rounded-lg bg-white/95 px-3 py-2 text-xs text-[#64748B] shadow-sm"
+      >
+        {{ pinCount }} หมุด
+      </p>
+    </div>
+  </section>
+
+
+
+
+
+
+
+
     @if(!RouteService.confirmRoute()){
     <div class="w-full shrink-0 bg-white border border-[#E4E7EC] rounded-xl p-5 mt-auto">
 
