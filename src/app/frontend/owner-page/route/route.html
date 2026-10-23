@@ -46,11 +46,11 @@
                 {{ index + 1 }}
               </span>
               <h3 [id]="'preview-job-' + index" class="text-sm font-semibold text-[#0F172A]">
-                ใบงาน {{ index + 1 }}
+                ใบงาน {{ jobLabel(index) }}
               </h3>
             </div>
             <span class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-500">
-              แผนตัวอย่าง
+              {{ jobStatus(index) }}
             </span>
           </div>
 
@@ -175,12 +175,12 @@
 
         <button
           type="button"
-          (click)="toggleCreateRoute()"
-          [disabled]="RouteService.isCreatingRoute()"
+          (click)="confirmPlan()"
+          [disabled]="RouteService.isCreatingRoute() || RouteService.confirmationUncertain() || !previewPlan()"
           [attr.aria-busy]="RouteService.isCreatingRoute()"
           class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#2eb872] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#259d60] disabled:cursor-wait disabled:opacity-60"
         >
-          <span>{{ RouteService.isCreatingRoute() ? 'กำลังสร้างใบงาน...' : 'ยืนยันสร้างใบงาน' }}</span>
+          <span>{{ RouteService.confirming() ? 'กำลังบันทึก...' : 'ยืนยันสร้างใบงาน' }}</span>
         </button>
       </div>
     }
