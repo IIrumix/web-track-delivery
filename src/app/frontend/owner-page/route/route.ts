@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { RouteService } from '../../../service/route.service';
+import { PlanningOrder } from '../../../model/delivery-response';
 
 @Component({
   imports: [],
@@ -21,6 +22,7 @@ export class Route {
   }
 
   async confirmPlan() {
+    if (this.choosingOrders()) return;
     if (await this.RouteService.confirmPreview()) {
       this.RouteService.getEligibleJobs(this.date).subscribe({
         error: () =>
@@ -43,7 +45,7 @@ export class Route {
 
   toggleCreateRoute() {
     // กันส่งคำขอซ้ำ แม้เรียกเมธอดโดยตรงระหว่างที่ API ยังทำงาน
-    if (this.RouteService.isCreatingRoute()) return;
+    if (this.RouteService.isCreatingRoute() || this.choosingOrders()) return;
     this.RouteService.loadingPreview.set(true);
     this.RouteService.planMessage.set(null);
     this.RouteService.getEligibleJobs(this.date).subscribe({
@@ -56,35 +58,113 @@ export class Route {
           this.RouteService.showCreationPage();
           return;
         }
-        // Backend รับ 1–30 ออเดอร์ต่อแผน จัดชุดแรกก่อน ที่เหลือจัดหลังยืนยันรอบนี้
-        const eligibleIds = [...new Set(orders.map((order) => order.order_id))];
-        const orderIds = eligibleIds.slice(0, 30);
-        const batchMessage = eligibleIds.length > 30
-          ? `คำนวณ 30 จาก ${eligibleIds.length} ออเดอร์ อีก ${eligibleIds.length - 30} รายการให้สร้างใบงานรอบถัดไปหลังยืนยัน`
-          : null;
-        this.RouteService.getPreviewPlan(orderIds, this.date).subscribe({
-          next: (preview) => {
-            // เริ่มชุดแผนใหม่เมื่อคำนวณจากรายการออเดอร์ใหม่
-            this.RouteService.seenPlanSignatures.set([preview.signature]);
-            this.RouteService.selectedJobIndex.set(null);
-            this.previewPlan.set(preview);
-            this.RouteService.createRoute.set(true);
-            this.RouteService.planMessage.set(batchMessage);
-            this.RouteService.confirmRoute.set(false);
-            this.RouteService.confirmationUncertain.set(false);
-            // เตรียมเส้นทางทุกใบงานไว้ใน service ให้หน้าแผนที่นำไปวาดต่อ
-            this.RouteService.loadRouteLines(preview);
-            this.RouteService.loadingPreview.set(false);
-          },
-          error: (error) => {
-            this.RouteService.loadingPreview.set(false);
-            this.RouteService.planMessage.set(this.previewError(error, 'โหลดแผนการขนส่งไม่สำเร็จ'));
-          },
-        });
+        this.availableOrders.set([
+          ...new Map(orders.map((order) => [order.order_id, order])).values(),
+        ]);
+        // เลือกรายการใน preview เดิมไว้ก่อน เฉพาะที่ Backend ยังให้จัดงานได้
+        const currentIds =
+          this.previewPlan()?.jobs.flatMap((job) => job.stops.map((stop) => stop.order.order_id)) ??
+          [];
+        const eligibleIds = new Set(orders.map((order) => order.order_id));
+        this.selectedOrderIds.set(new Set(this.previewPlan()
+          ? currentIds.filter((id) => eligibleIds.has(id))
+          : this.availableOrders().slice(0, 30).map(order => order.order_id)));
+        this.RouteService.loadingPreview.set(false);
+        this.choosingOrders.set(true);
+        this.orderDialog?.nativeElement.showModal();
       },
       error: (error) => {
         this.RouteService.loadingPreview.set(false);
         this.RouteService.planMessage.set(this.previewError(error, 'โหลดออเดอร์ไม่สำเร็จ'));
+      },
+    });
+  }
+
+  @ViewChild('orderDialog', { static: true }) orderDialog?: ElementRef<HTMLDialogElement>;
+  readonly availableOrders = signal<PlanningOrder[]>([]);
+  readonly selectedOrderIds = signal(new Set<number>());
+  readonly choosingOrders = signal(false);
+
+  toggleOrder(id: number, checked: boolean) {
+    if (
+      this.RouteService.isCreatingRoute() ||
+      !this.availableOrders().some((order) => order.order_id === id)
+    )
+      return;
+    const selected = new Set(this.selectedOrderIds());
+    if (checked && selected.size >= 30) return;
+    if (checked) selected.add(id);
+    else selected.delete(id);
+    this.selectedOrderIds.set(selected);
+  }
+
+  selectAllOrders() {
+    if (this.RouteService.isCreatingRoute()) return;
+    this.selectedOrderIds.set(
+      new Set(
+        this.availableOrders()
+          .slice(0, 30)
+          .map((order) => order.order_id),
+      ),
+    );
+  }
+
+  clearOrderSelection() {
+    if (!this.RouteService.isCreatingRoute()) this.selectedOrderIds.set(new Set());
+  }
+
+  closeOrderForm() {
+    this.choosingOrders.set(false);
+    this.orderDialog?.nativeElement.close();
+  }
+
+  cancelOrderForm(event?: Event) {
+    if (this.RouteService.isCreatingRoute()) {
+      event?.preventDefault();
+      return;
+    }
+    this.closeOrderForm();
+    this.RouteService.planMessage.set(null);
+  }
+
+  // ส่งเฉพาะรายการที่ผู้ใช้เลือก ไม่เลือก 30 รายการแรกให้อัตโนมัติ
+  calculateSelectedOrders(event?: Event) {
+    event?.preventDefault();
+    if (!this.choosingOrders() || this.RouteService.isCreatingRoute()) return;
+    const orderIds = [...this.selectedOrderIds()];
+    if (orderIds.length > 30) return;
+    if (!orderIds.length) {
+      if (!this.previewPlan()) return;
+      // นำออกจาก preview เท่านั้น ไม่ลบออเดอร์หรือเปลี่ยนสถานะในฐานข้อมูล
+      this.previewPlan.set(null);
+      this.RouteService.createRoute.set(false);
+      this.RouteService.confirmRoute.set(false);
+      this.RouteService.seenPlanSignatures.set([]);
+      this.RouteService.planMessage.set(null);
+      this.RouteService.showCreationPage();
+      this.closeOrderForm();
+      return;
+    }
+    this.RouteService.loadingPreview.set(true);
+    this.RouteService.planMessage.set(null);
+    this.RouteService.getPreviewPlan(orderIds, this.date).subscribe({
+      next: (preview) => {
+        // เริ่มชุดแผนใหม่เมื่อคำนวณจากรายการออเดอร์ใหม่
+        this.RouteService.seenPlanSignatures.set([preview.signature]);
+        this.RouteService.selectedJobIndex.set(null);
+        this.previewPlan.set(preview);
+        this.RouteService.createRoute.set(true);
+        this.RouteService.planMessage.set(null);
+        this.closeOrderForm();
+        this.RouteService.confirmRoute.set(false);
+        this.RouteService.confirmationUncertain.set(false);
+        // เตรียมเส้นทางทุกใบงานไว้ใน service ให้หน้าแผนที่นำไปวาดต่อ
+        this.RouteService.loadRouteLines(preview);
+        this.RouteService.loadingPreview.set(false);
+      },
+      error: (error) => {
+        this.RouteService.loadingPreview.set(false);
+        this.RouteService.planMessage.set(this.previewError(error, 'โหลดแผนการขนส่งไม่สำเร็จ'));
       },
     });
   }
@@ -94,8 +174,14 @@ export class Route {
     const body = (error as { error?: { error?: unknown; details?: unknown } } | null)?.error;
     const message = typeof body?.error === 'string' ? body.error : fallback;
     const details = Array.isArray(body?.details) ? body.details : [];
-    return [message, ...details.flatMap(item => item && typeof item.reason === 'string'
-      ? [`ออเดอร์ #${item.order_id ?? '-'}: ${item.reason}`] : [])].join(' — ');
+    return [
+      message,
+      ...details.flatMap((item) =>
+        item && typeof item.reason === 'string'
+          ? [`ออเดอร์ #${item.order_id ?? '-'}: ${item.reason}`]
+          : [],
+      ),
+    ].join(' — ');
   }
 
   requestAlternativePlan() {
