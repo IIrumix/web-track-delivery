@@ -2,6 +2,7 @@ import {
   PlanningOrder as DeliveryOrder,
   PlanningSettings as Settings,
   PlannedJob,
+  RouteLine,
 } from './delivery-response';
 export interface JobListItem {
   job_id: number;
@@ -22,6 +23,7 @@ export interface JobListItem {
 }
 export interface RiderJob extends JobListItem {
   settings: Settings | null;
+  route_geometry?: RouteLine | null;
   totals: Omit<PlannedJob, 'stops'> | null;
   stops: {
     stop_id: number;

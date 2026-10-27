@@ -104,7 +104,17 @@ export class RouteService {
       if (this.viewingSaved()) {
         this.routeLines.set([]);
         const plan = this.savedPlan();
-        if (plan) this.loadRouteLines(plan);
+        if (plan) {
+          const storedRoutes: PreviewJobRoute[] = saved.flatMap((job, jobIndex) => {
+            const line = job.route_geometry;
+            return line?.type === 'LineString' && Array.isArray(line.coordinates) &&
+              line.coordinates.length > 1 && line.coordinates.every(point =>
+                Array.isArray(point) && point.length >= 2 &&
+                point.every(value => typeof value === 'number' && Number.isFinite(value)))
+              ? [{ jobIndex, line }] : [];
+          });
+          this.loadRouteLines(plan, storedRoutes);
+        }
       }
       return true;
     } catch {
@@ -206,14 +216,20 @@ export class RouteService {
     return this.http.post<RouteLine>('/api/job-sheets/route', { points });
   }
 
-  loadRouteLines(preview: Pick<DeliveryPlan, 'settings' | 'jobs' | 'summary'>) {
-    // ล้างเส้นของแผนเดิม เพื่อไม่ให้แผนที่นำไปใช้กับใบงานชุดใหม่
-    this.routeLines.set([]);
+  loadRouteLines(
+    preview: Pick<DeliveryPlan, 'settings' | 'jobs' | 'summary'>,
+    storedRoutes: PreviewJobRoute[] = [],
+  ) {
+    // แสดงเส้นที่บันทึกไว้ก่อน แล้วขอเฉพาะใบงานที่ยังไม่มีเส้น
+    this.routeLines.set(storedRoutes);
     this.routeError.set(null);
-    this.loadingRoutes.set(preview.jobs.length > 0);
-    if (preview.jobs.length === 0) return;
+    const storedIndexes = new Set(storedRoutes.map(route => route.jobIndex));
+    const missingJobs = preview.jobs.map((job, jobIndex) => ({ job, jobIndex }))
+      .filter(({ jobIndex }) => !storedIndexes.has(jobIndex));
+    this.loadingRoutes.set(missingJobs.length > 0);
+    if (missingJobs.length === 0) return;
 
-    const requests = preview.jobs.map((job, jobIndex) => {
+    const requests = missingJobs.map(({ job, jobIndex }) => {
       // ส่งแยกทีละใบงาน: ร้าน → จุดส่งตามลำดับ → ร้าน (ถ้าเลือกกลับร้าน)
       const points = [
         preview.settings.origin,
@@ -231,7 +247,7 @@ export class RouteService {
     forkJoin(requests).subscribe({
       next: (routes) => {
         if (this.displayPlan() !== preview) return;
-        this.routeLines.set(routes);
+        this.routeLines.set([...storedRoutes, ...routes].sort((a, b) => a.jobIndex - b.jobIndex));
         this.loadingRoutes.set(false);
       },
       error: () => {

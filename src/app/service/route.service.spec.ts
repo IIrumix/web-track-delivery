@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { RouteService } from './route.service';
-import { DeliveryPlan } from '../model/delivery-response';
+import { DeliveryPlan, RouteLine } from '../model/delivery-response';
 
 describe('Confirmation with saved map data', () => {
   let service: RouteService;
@@ -70,6 +70,45 @@ describe('Confirmation with saved map data', () => {
     expect(service.routeLines()).toHaveLength(0);
     expect(service.createRoute()).toBe(false);
     expect(service.confirmRoute()).toBe(false);
+  });
+  it('uses stored geometry without requesting routes', async () => {
+    const line: RouteLine = { type: 'LineString', coordinates: [[103.25, 16.25], [103.26, 16.26]] };
+    service.viewingSaved.set(true);
+    const work = service.loadSavedJobs('2026-10-22');
+    http.expectOne('/api/job-sheets?date=2026-10-22').flush([{ job_code: '012345' }]);
+    await Promise.resolve();
+    http.expectOne('/api/job-sheets/by-code/012345').flush({ ...saved, route_geometry: line });
+    await work;
+    expect(service.routeLines()).toEqual([{ jobIndex: 0, line }]);
+    expect(service.loadingRoutes()).toBe(false);
+    http.expectNone('/api/job-sheets/route');
+  });
+  it('shows stored routes while loading only missing jobs and keeps job indexes', async () => {
+    const line: RouteLine = { type: 'LineString', coordinates: [[103.25, 16.25], [103.26, 16.26]] };
+    service.viewingSaved.set(true);
+    const work = service.loadSavedJobs('2026-10-22');
+    http.expectOne('/api/job-sheets?date=2026-10-22').flush([{ job_code: 'old' }, { job_code: 'new' }]);
+    await Promise.resolve();
+    http.expectOne('/api/job-sheets/by-code/old').flush({ ...saved, route_geometry: null });
+    http.expectOne('/api/job-sheets/by-code/new').flush({ ...saved, route_geometry: line });
+    await work;
+    expect(service.routeLines()).toEqual([{ jobIndex: 1, line }]);
+    expect(service.loadingRoutes()).toBe(true);
+    http.expectOne('/api/job-sheets/route').flush(line);
+    expect(service.routeLines()).toEqual([{ jobIndex: 0, line }, { jobIndex: 1, line }]);
+    expect(service.loadingRoutes()).toBe(false);
+  });
+  it('keeps stored routes when a missing route fails', () => {
+    const line: RouteLine = { type: 'LineString', coordinates: [[103.25, 16.25], [103.26, 16.26]] };
+    const plan = { ...preview, jobs: [saved.totals, saved.totals].map(totals => ({
+      ...totals, stops: saved.stops,
+    })) } as unknown as DeliveryPlan;
+    service.previewPlan.set(plan);
+    service.loadRouteLines(plan, [{ jobIndex: 0, line }]);
+    http.expectOne('/api/job-sheets/route').flush({}, { status: 502, statusText: 'Bad Gateway' });
+    expect(service.routeLines()).toEqual([{ jobIndex: 0, line }]);
+    expect(service.loadingRoutes()).toBe(false);
+    expect(service.routeError()).toBeTruthy();
   });
   it('restores saved jobs without a preview', async () => {
     service.viewingSaved.set(true);
