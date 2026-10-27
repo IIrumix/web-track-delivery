@@ -7,24 +7,40 @@
     } @else if (loadError()) {
       <div role="alert" class="px-6 py-10 text-center">
         <p class="m-0 text-sm text-red-700">{{ loadError() }}</p>
-
-        <button
-          type="button"
-          (click)="loadJob()"
-          class="mt-4 cursor-pointer rounded-lg border border-[#dce6e8] bg-transparent px-4 py-2 text-sm font-semibold text-[#0f172a] hover:bg-[#e3f8ed]"
-        >
-          ลองใหม่
-        </button>
+          <div class="flex justify-center gap-2">
+            <a
+              href="/"
+              class="mt-4 cursor-pointer rounded-lg border border-[#dce6e8] bg-transparent px-4 py-2 text-sm font-semibold text-[#0f172a] hover:bg-[#e3f8ed]"
+            >
+              ย้อนกลับ
+            </a>
+            
+            <button
+              type="button"
+              (click)="loadJob()"
+              class="mt-4 cursor-pointer rounded-lg border border-[#dce6e8] bg-transparent px-4 py-2 text-sm font-semibold text-[#0f172a] hover:bg-[#e3f8ed]"
+            >
+              ลองใหม่
+            </button>
+          </div>
       </div>
     } @else {
       <header class="px-6 max-[440px]:px-5">
-        <p
-          data-testid="work-meta"
-          class="m-0 mb-2 flex items-center gap-1.75 text-[13px] leading-5 text-[#647b96] max-[440px]:text-[11px]"
-        >
-          <span class="size-2 flex-[0_0_8px] rounded-full bg-[#22c55e]" aria-hidden="true"></span>
-          {{ job().dateLabel | date: 'dd/MM/yyyy' }} - งาน {{ workNumber }}
-        </p>
+        <div class="flex justify-between">
+            <p
+              data-testid="work-meta"
+              class="m-0 mb-2 flex items-center gap-1.75 text-[13px] leading-5 text-[#647b96] max-[440px]:text-[11px]"
+            >
+              <span class="size-2 flex-[0_0_8px] rounded-full bg-[#22c55e]" aria-hidden="true"></span>
+              {{ job().dateLabel | date: 'dd/MM/yyyy' }} - งาน {{ workNumber }}
+            </p>
+            <a
+              href="/"
+              class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-transparent text-[#22c55e] transition-colors hover:bg-[#eafaf3]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 18V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0693 2.81985L3.13929 8.36985C2.35929 8.98985 1.85929 10.2998 2.02929 11.2798L3.35929 19.2398C3.59929 20.6598 4.95929 21.8098 6.39929 21.8098H17.5993C19.0293 21.8098 20.3993 20.6498 20.6393 19.2398L21.9693 11.2798C22.1293 10.2998 21.6293 8.98985 20.8593 8.36985L13.9293 2.82985C12.8593 1.96985 11.1293 1.96985 10.0693 2.81985Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+        </div>
         <div class="flex items-center justify-between gap-3 max-[374px]:gap-1.5">
           <h1
             class="m-0 text-[30px] leading-normal font-normal tracking-[-0.6px] max-[440px]:text-[26px] max-[374px]:text-[23px]"
