@@ -216,7 +216,7 @@
           [attr.aria-busy]="RouteService.isCreatingRoute()"
           aria-label="เสนอแผนอื่น"
           title="เสนอแผนอื่น"
-          class="w-1/3 flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[#E4E7EC] bg-white px-4 py-3 text-sm font-semibold text-[#0F172A] transition-colors hover:bg-[#F8FAFC] active:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
+          class="w-1/4 flex shrink-0 items-center justify-center gap-2 rounded-lg border border-[#E4E7EC] bg-white px-4 py-3 text-sm font-semibold text-[#0F172A] transition-colors hover:bg-[#F8FAFC] active:bg-[#F1F5F9] disabled:cursor-wait disabled:opacity-60"
         >
           <svg
             class="h-4 w-4 text-[#0F172A]/62"
@@ -240,7 +240,7 @@
             RouteService.isCreatingRoute() || RouteService.confirmationUncertain() || !previewPlan()
           "
           [attr.aria-busy]="RouteService.isCreatingRoute()"
-          class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#2eb872] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#259d60] disabled:cursor-wait disabled:opacity-60"
+          class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#4dc187] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#259d60] disabled:cursor-wait disabled:opacity-60"
         >
           <span>{{ RouteService.confirming() ? 'กำลังบันทึก...' : 'ยืนยันสร้างใบงาน' }}</span>
         </button>
