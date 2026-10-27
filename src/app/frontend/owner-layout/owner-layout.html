@@ -39,7 +39,7 @@
             <app-customer-detail-panel [ownerCod]="ownerCod?.length === 2 ? [ownerCod[0], ownerCod[1]] : null"></app-customer-detail-panel>
         } @else if (router.url.startsWith('/owner/order')) {
             <app-order-detail-panel class="flex-1 h-full" [selectedData]="selectedItem" [ownerCod]="ownerCod?.length === 2 ? [ownerCod[0], ownerCod[1]] : null"></app-order-detail-panel>
-        } @else if (router.url.startsWith('/owner/route')){
+        } @else if (router.url.startsWith('/owner/route') || router.url.startsWith('/owner/confirmed-jobs')){
             <app-route-detail-page class="flex-1 h-full" [ownerCod]="ownerCod?.length === 2 ? [ownerCod[0], ownerCod[1]] : null"></app-route-detail-page>
         }
     </div>

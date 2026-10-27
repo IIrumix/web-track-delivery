@@ -23,6 +23,7 @@ export const routes: Routes = [
       { path: 'customer', component: Customer },
       { path: 'order', component: Order },
       { path: 'route', component: Route },
+      { path: 'confirmed-jobs', loadComponent: () => import('./frontend/owner-page/confirmed-jobs/confirmed-jobs').then(m => m.ConfirmedJobs) },
     ],
   },
 ];

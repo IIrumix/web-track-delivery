@@ -18,7 +18,7 @@ export interface PlannedJob {
   total_duration_minutes: number; delivery_cost: number; revenue: number; food_cost: number; profit: number;
 }
 export interface Preview {
-  preview_id: string; expires_at: string; signature: string; method: string;
+  preview_id: string; expires_at: string; method: string;
   settings: Settings; jobs: PlannedJob[];
   summary: { total_orders: number; total_boxes: number; riders: number; total_distance_km: number;
     delivery_cost: number; revenue: number; food_cost: number; profit: number };

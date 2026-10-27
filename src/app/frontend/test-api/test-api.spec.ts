@@ -8,7 +8,7 @@ describe('Delivery planning test UI', () => {
   let component: TestApi;
   let http: HttpTestingController;
   const preview: Preview = {
-    preview_id: 'preview-1', expires_at: '2030-01-01T00:00:00Z', signature: 'signature', method: 'test',
+    preview_id: 'preview-1', expires_at: '2099-01-01T00:00:00Z', method: 'test',
     settings: { delivery_date: '2026-10-05', departure_time: '11:30', deadline_time: '12:30',
       origin: { latitude: 16.25, longitude: 103.25 }, speed_kmh: 30, service_minutes: 2,
       fixed_cost: 15, cost_per_km_per_box: 2, return_to_shop: false },
@@ -46,15 +46,15 @@ describe('Delivery planning test UI', () => {
     http.expectNone('http://localhost:3000/job-sheets/confirm');
     component.toggle(81, false);
     expect(component.activePreview()).toBeNull();
-    expect(component.previews()).toEqual([]);
   });
 
   it('keeps the current plan when no alternative is available', async () => {
     component.selected.set(new Set([81]));
-    component.activePreview.set(preview); component.previews.set([preview]);
+    component.activePreview.set(preview);
     const promise = component.calculate(true);
     const req = http.expectOne('http://localhost:3000/job-sheets/preview');
-    expect(req.request.body.exclude_signatures).toEqual(['signature']);
+    expect(req.request.body.previous_preview_id).toBe('preview-1');
+    expect(req.request.body.exclude_signatures).toBeUndefined();
     req.flush({ error: 'ไม่พบแผนทางเลือก' }, { status: 422, statusText: 'Unprocessable Entity' });
     await promise;
     expect(component.activePreview()).toBe(preview);

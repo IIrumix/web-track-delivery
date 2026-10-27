@@ -70,7 +70,7 @@
     </div>
     <div class="row">
       <button class="primary" (click)="calculate()" [disabled]="busy() || !selected().size">คำนวณแผนจัดส่ง</button>
-      <button (click)="calculate(true)" [disabled]="busy() || !activePreview() || previews().length >= 20">เสนอแผนอื่น</button>
+      <button (click)="calculate(true)" [disabled]="busy() || !activePreview()">เสนอแผนอื่น</button>
     </div>
   </section>
 
@@ -84,11 +84,7 @@
   @if (activePreview(); as preview) {
     <section>
       <h2>4. ตรวจและยืนยันแผน</h2>
-      <div class="row">
-        @for (item of previews(); track item.preview_id; let index = $index) {
-          <button (click)="choosePreview(item)" [class.chosen]="item.preview_id === preview.preview_id" [disabled]="busy()">แผน {{ index + 1 }} — {{ item.summary.delivery_cost | number:'1.2-2' }} บาท</button>
-        }
-      </div>
+      <p class="hint">แสดงเฉพาะแผนปัจจุบัน ขอแผนอื่นได้เรื่อย ๆ และอาจวนกลับมาแผนที่เคยเห็น</p>
       <p>{{ preview.method }}</p>
       <p><strong>{{ preview.summary.riders }} ใบงาน / {{ preview.summary.total_orders }} ออเดอร์ / {{ preview.summary.total_boxes }} กล่อง</strong></p>
       <p>ระยะทางรวม {{ preview.summary.total_distance_km | number:'1.2-2' }} กม. • ยอดขาย {{ preview.summary.revenue | number:'1.2-2' }} • ต้นทุนอาหาร {{ preview.summary.food_cost | number:'1.2-2' }} • ค่าส่ง {{ preview.summary.delivery_cost | number:'1.2-2' }} บาท</p>

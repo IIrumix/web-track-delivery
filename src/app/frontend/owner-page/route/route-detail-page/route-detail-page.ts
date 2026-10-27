@@ -26,10 +26,10 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
   readonly selectedJob = computed(() => {
     const selectedIndex = this.RouteService.selectedJobIndex();
     if (selectedIndex === null) return null;
-    return this.RouteService.previewPlan()?.jobs[selectedIndex] ?? null;
+    return this.RouteService.displayPlan()?.jobs[selectedIndex] ?? null;
   });
   readonly summary = computed(() => {
-    const plan = this.RouteService.previewPlan();
+    const plan = this.RouteService.displayPlan();
     if (plan === null) return null;
 
     const job = this.selectedJob();
@@ -74,7 +74,7 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
   constructor() {
     effect(() => {
       this.ownerCod();
-      this.RouteService.previewPlan();
+      this.RouteService.displayPlan();
       this.RouteService.routeLines();
       this.RouteService.selectedJobIndex();
       this.drawOrderPins();
@@ -124,7 +124,7 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
       this.markerGroup.addLayer(ownerMarker);
     }
 
-    const plan = this.RouteService.previewPlan();
+    const plan = this.RouteService.displayPlan();
     if (plan === null) {
       this.showAll();
       return;
