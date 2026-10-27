@@ -65,7 +65,7 @@ describe('Order selection form', () => {
     component.calculateSelectedOrders();
     const request = http.expectOne('/api/job-sheets/preview');
     expect(request.request.body.order_ids).toEqual([2, 3]);
-    request.flush({ preview_id: 'edited', signature: 's', jobs: [], settings: {}, summary: {} });
+    request.flush({ preview_id: 'edited', jobs: [], settings: {}, summary: {} });
     // Opening again fetches eligible orders, including the one removed from the draft.
     open();
     component.clearOrderSelection();
@@ -96,8 +96,68 @@ describe('Order selection form', () => {
     component.calculateSelectedOrders();
     http
       .expectOne('/api/job-sheets/preview')
-      .flush({ preview_id: 'new', signature: 'sig', jobs: [], summary: {}, settings: {} });
+      .flush({ preview_id: 'new', jobs: [], summary: {}, settings: {} });
     expect(component.choosingOrders()).toBe(false);
     expect(component.previewPlan()?.preview_id).toBe('new');
+  });
+
+  function currentPreview(): DeliveryPlan {
+    const orders = [1, 2].map(order_id => ({
+      order_id, customer_id: order_id, delivery_date: '2026-10-22', quantity: 1,
+      unit_price: 65, unit_cost: 40, status: 'ACTIVE', name: 'ทดสอบ', phone: '', address: '',
+      latitude: 16.25, longitude: 103.25,
+    }));
+    return {
+      preview_id: 'current', expires_at: '2099-01-01T00:00:00Z', method: 'Greedy',
+      settings: { delivery_date: '2026-10-22', departure_time: '11:00', deadline_time: '12:00',
+        origin: { latitude: 16.25, longitude: 103.25 }, speed_kmh: 25, service_minutes: 3,
+        fixed_cost: 15, cost_per_km_per_box: 2, return_to_shop: false },
+      jobs: [{ stops: orders.map((order, index) => ({ order, stop_sequence: index + 1,
+        distance_from_previous_km: 1, estimated_arrival_at: '', estimated_departure_at: '' })),
+        total_boxes: 2, total_distance_km: 2, total_duration_minutes: 8, delivery_cost: 23,
+        revenue: 130, food_cost: 80, profit: 27 }],
+      summary: { total_orders: 2, total_boxes: 2, riders: 1, total_distance_km: 2,
+        delivery_cost: 23, revenue: 130, food_cost: 80, profit: 27 },
+    };
+  }
+
+  it('sends only the current preview ID, keeps the plan on failure and prevents duplicate clicks', () => {
+    const current = currentPreview();
+    component.previewPlan.set(current);
+    component.requestAlternativePlan();
+    component.requestAlternativePlan();
+    const request = http.expectOne('/api/job-sheets/preview');
+    expect(request.request.body).toEqual({ order_ids: [1, 2], settings: current.settings,
+      previous_preview_id: 'current' });
+    expect(component.previewPlan()).toBe(current);
+    request.flush({ error: 'ไม่พบแผนที่ต่าง' }, { status: 422, statusText: 'Unprocessable Entity' });
+    expect(component.previewPlan()).toBe(current);
+    expect(component.RouteService.loadingPreview()).toBe(false);
+    expect(component.RouteService.planMessage()).toContain('ไม่พบแผนที่ต่าง');
+  });
+
+  it('can change plans more than 20 times, replacing only the current ID and refreshing route data', () => {
+    component.previewPlan.set(currentPreview());
+    for (let index = 0; index < 22; index++) {
+      const current = component.previewPlan()!;
+      component.requestAlternativePlan();
+      const request = http.expectOne('/api/job-sheets/preview');
+      expect(request.request.body.previous_preview_id).toBe(current.preview_id);
+      expect(request.request.body.exclude_signatures).toBeUndefined();
+      request.flush({ ...current, preview_id: `new-${index}` });
+      expect(component.previewPlan()?.preview_id).toBe(`new-${index}`);
+      expect(component.RouteService.isCreatingRoute()).toBe(true);
+      http.expectOne('/api/job-sheets/route').flush({ type: 'LineString', coordinates: [[103.25, 16.25], [103.251, 16.251]] });
+      expect(component.RouteService.isCreatingRoute()).toBe(false);
+    }
+  });
+
+  it('sends the existing ID when editing a live draft so the backend can remove that draft after success', () => {
+    component.previewPlan.set(currentPreview());
+    open();
+    component.calculateSelectedOrders();
+    const request = http.expectOne('/api/job-sheets/preview');
+    expect(request.request.body.previous_preview_id).toBe('current');
+    request.flush({ error: 'test' }, { status: 422, statusText: 'Unprocessable Entity' });
   });
 });

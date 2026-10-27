@@ -42,8 +42,6 @@ export class RouteService {
     () => this.loadingPreview() || this.loadingRoutes() || this.confirming() || this.loadingSaved(),
   );
   readonly routeError = signal<string | null>(null);
-  // เก็บแผนที่เคยแสดงไว้ใน service เพื่อขอแผนอื่นได้ต่อหลังเปลี่ยนหน้า
-  readonly seenPlanSignatures = signal<string[]>([]);
   readonly planMessage = signal<string | null>(null);
 
   // อ่านใบงานจากฐานข้อมูลแล้วแปลงเป็นโครงสร้างเดิม ให้ UI และแมพทำงานต่อได้
@@ -144,7 +142,6 @@ export class RouteService {
       confirmed = true;
       this.previewPlan.set(null);
       this.routeLines.set([]);
-      this.seenPlanSignatures.set([]);
       this.selectedJobIndex.set(null);
       this.confirmRoute.set(false);
       this.createRoute.set(false);
@@ -248,7 +245,7 @@ export class RouteService {
   getPreviewPlan(
     orderIds: number[],
     deliveryDate: string,
-    excludeSignatures: string[] = [],
+    previousPreviewId?: string,
     settings?: PlanningSettings,
   ) {
     const requestBody = {
@@ -268,7 +265,7 @@ export class RouteService {
         cost_per_km_per_box: 2,
         return_to_shop: false,
       },
-      exclude_signatures: excludeSignatures,
+      previous_preview_id: previousPreviewId,
     };
 
     return this.http.post<DeliveryPlan>('/api/job-sheets/preview', requestBody);

@@ -139,7 +139,6 @@ export class Route {
       this.previewPlan.set(null);
       this.RouteService.createRoute.set(false);
       this.RouteService.confirmRoute.set(false);
-      this.RouteService.seenPlanSignatures.set([]);
       this.RouteService.planMessage.set(null);
       this.RouteService.showCreationPage();
       this.closeOrderForm();
@@ -147,10 +146,11 @@ export class Route {
     }
     this.RouteService.loadingPreview.set(true);
     this.RouteService.planMessage.set(null);
-    this.RouteService.getPreviewPlan(orderIds, this.date).subscribe({
+    const current = this.previewPlan();
+    const previousId = current && Date.parse(current.expires_at) > Date.now()
+      ? current.preview_id : undefined;
+    this.RouteService.getPreviewPlan(orderIds, this.date, previousId).subscribe({
       next: (preview) => {
-        // เริ่มชุดแผนใหม่เมื่อคำนวณจากรายการออเดอร์ใหม่
-        this.RouteService.seenPlanSignatures.set([preview.signature]);
         this.RouteService.selectedJobIndex.set(null);
         this.previewPlan.set(preview);
         this.RouteService.createRoute.set(true);
@@ -165,6 +165,12 @@ export class Route {
       error: (error) => {
         this.RouteService.loadingPreview.set(false);
         this.RouteService.planMessage.set(this.previewError(error, 'โหลดแผนการขนส่งไม่สำเร็จ'));
+        // รหัสเก่าหาย/หมดอายุ ให้กดคำนวณใหม่ได้โดยไม่ส่งรหัสที่ใช้ไม่ได้ซ้ำ
+        if (error.status === 409) {
+          this.previewPlan.set(null);
+          this.RouteService.routeLines.set([]);
+          this.RouteService.createRoute.set(false);
+        }
       },
     });
   }
@@ -188,17 +194,6 @@ export class Route {
     const currentPlan = this.previewPlan();
     if (!currentPlan || this.RouteService.isCreatingRoute()) return;
 
-    const excluded = [
-      ...new Set([...this.RouteService.seenPlanSignatures(), currentPlan.signature]),
-    ];
-    // Backend รับรายการแผนที่ขอข้ามได้สูงสุด 20 แผน
-    if (excluded.length > 20) {
-      this.RouteService.planMessage.set(
-        'ขอแผนอื่นครบ 20 ครั้งแล้ว กรุณาใช้แผนปัจจุบันหรือเริ่มคำนวณใหม่',
-      );
-      return;
-    }
-
     // อ่านออเดอร์จาก preview เดิม จึงยังใช้ได้แม้เปลี่ยนหน้าแล้วกลับมา
     const orderIds = currentPlan.jobs.flatMap((job) =>
       job.stops.map((stop) => stop.order.order_id),
@@ -208,11 +203,10 @@ export class Route {
     this.RouteService.getPreviewPlan(
       orderIds,
       currentPlan.settings.delivery_date,
-      excluded,
+      currentPlan.preview_id,
       currentPlan.settings,
     ).subscribe({
       next: (preview) => {
-        this.RouteService.seenPlanSignatures.set([...excluded, preview.signature]);
         this.RouteService.selectedJobIndex.set(null);
         this.previewPlan.set(preview);
         this.RouteService.loadRouteLines(preview);
@@ -226,6 +220,11 @@ export class Route {
             : 'ขอแผนอื่นไม่สำเร็จ กรุณาลองอีกครั้ง',
         );
         this.RouteService.loadingPreview.set(false);
+        if (error.status === 409) {
+          this.previewPlan.set(null);
+          this.RouteService.routeLines.set([]);
+          this.RouteService.createRoute.set(false);
+        }
       },
     });
   }

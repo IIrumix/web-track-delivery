@@ -28,7 +28,6 @@ export class TestApi implements OnInit, AfterViewInit, OnDestroy {
   readonly jobs = signal<JobListItem[]>([]);
   readonly dates = signal<{ delivery_date: string; total_orders: number; eligible_orders: number }[]>([]);
   readonly selected = signal<Set<number>>(new Set());
-  readonly previews = signal<Preview[]>([]);
   readonly activePreview = signal<Preview | null>(null);
   readonly riderJob = signal<RiderJob | null>(null);
   workCode = '';
@@ -110,7 +109,7 @@ export class TestApi implements OnInit, AfterViewInit, OnDestroy {
     await this.perform(async () => { await this.loadLists(); });
   }
   invalidatePlans() {
-    this.previews.set([]); this.activePreview.set(null);
+    this.activePreview.set(null);
     this.drawVersion++; this.layer?.clearLayers(); this.mapMessage.set('');
   }
   toggle(id: number, checked: boolean) {
@@ -125,6 +124,9 @@ export class TestApi implements OnInit, AfterViewInit, OnDestroy {
   selectedBoxes() { return this.orders().filter(order => this.selected().has(order.order_id)).reduce((sum, order) => sum + Number(order.quantity), 0); }
 
   async calculate(alternative = false) {
+    if (this.busy()) return;
+    const current = this.activePreview();
+    if (alternative && !current) return;
     if (!this.selected().size || this.selected().size > 30) { this.error.set('เลือกออเดอร์ 1–30 รายการ'); return; }
     if (this.settings.origin.latitude === null || this.settings.origin.longitude === null) {
       this.error.set('กรอกพิกัดร้าน หรือคลิกตำแหน่งร้านบนแผนที่'); return;
@@ -132,15 +134,14 @@ export class TestApi implements OnInit, AfterViewInit, OnDestroy {
     await this.perform(async () => {
       const preview = await firstValueFrom(this.http.post<Preview>(this.url('/preview'), {
         settings: this.settings, order_ids: [...this.selected()],
-        exclude_signatures: alternative ? this.previews().map(item => item.signature) : [],
+        previous_preview_id: current && Date.parse(current.expires_at) > Date.now()
+          ? current.preview_id : undefined,
       }));
-      this.previews.update(items => alternative ? [...items, preview] : [preview]);
       this.activePreview.set(preview); this.rememberSettings();
       this.message.set('คำนวณแล้ว กรุณาตรวจแผนก่อนยืนยัน ยังไม่ได้สร้างใบงาน');
       void this.drawPreview(preview);
     });
   }
-  choosePreview(preview: Preview) { this.activePreview.set(preview); void this.drawPreview(preview); }
   async confirm() {
     const preview = this.activePreview();
     if (!preview || this.busy()) return;

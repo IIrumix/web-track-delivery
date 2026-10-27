@@ -74,7 +74,6 @@ export interface DeliveryPlan {
     food_cost: number;
     profit: number;
   };
-  signature: string;
   method: string;
 }
 
