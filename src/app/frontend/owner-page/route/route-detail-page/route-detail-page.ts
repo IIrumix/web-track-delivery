@@ -217,7 +217,7 @@ export class RouteDetailPage implements AfterViewInit, OnDestroy {
   }
 
   private getJobColor(index: number): string {
-    const colors = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c'];
+    const colors = ['#2563eb','#dc2626','#16a34a','#9333ea','#ea580c','#0891b2', '#db2777', '#ca8a04', '#475569','#65a30d',];
     return colors[index % colors.length];
   }
 

@@ -43,6 +43,14 @@ export class Route {
     return job?.completed_at ? 'ส่งครบแล้ว' : job?.started_at ? 'กำลังส่ง' : 'รอเริ่มงาน';
   }
 
+  getJobColor(index: number): string {
+    const colors = [
+      '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c',
+      '#0891b2', '#db2777', '#ca8a04', '#475569', '#65a30d',
+    ];
+    return colors[index % colors.length];
+  }
+
   toggleCreateRoute() {
     // กันส่งคำขอซ้ำ แม้เรียกเมธอดโดยตรงระหว่างที่ API ยังทำงาน
     if (this.RouteService.isCreatingRoute() || this.choosingOrders()) return;
